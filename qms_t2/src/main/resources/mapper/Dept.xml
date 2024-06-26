@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.dept.dao.DeptDao">
+	
+	<resultMap type="com.qms.dept.vo.DeptVO" id="deptMap">
+		<result property="deptCd" 				column="DEPT_CD"/>
+		<result property="deptName" 			column="DEPT_NAME"/>
+		<result property="upDeptCd"				column="UP_DEPT_CD"/>
+		<result property="upDeptName"			column="UP_DEPT_NAME"/>
+		<result property="delYn" 				column="DEL_YN"/>
+		<result property="positionCd" 			column="POSITION_CD" />
+		<result property="deptName" 			column="DEPT_NAME" />	
+		<result property="userCount"   			column="USER_COUNT" />
+		<result property="comGrpCd" 			column="COM_GRP_CD" />	
+		<result property="regDt"      			column="REG_DT" />
+	    <result property="regUserId"  			column="REG_USER_ID" />
+	    <result property="updDt"       			column="UPD_DT" />
+	    <result property="updUserId"   			column="UP_USER_ID" />
+	    
+	</resultMap>
+	
+	<select id="selectTotalDeptCount" resultType="integer">
+		SELECT COUNT(*)
+	 	FROM 
+           	TB_DEPT_INFO A
+        LEFT JOIN (
+            SELECT 
+                B.DEPT_CD,
+                COUNT(B.DEPT_CD) AS USER_COUNT
+            FROM 
+                TB_USER_INFO B
+            WHERE 
+           		LEAVE_YN = 'N'
+            GROUP BY 
+                B.DEPT_CD
+        ) U ON A.DEPT_CD = U.DEPT_CD
+        LEFT JOIN 
+            TB_DEPT_INFO C ON A.UP_DEPT_CD = C.DEPT_CD 
+        WHERE 
+            1=1
+            <if test="deptName != null and deptName != ''">
+                AND A.DEPT_NAME LIKE '%' || #{deptName} || '%'
+            </if>
+            <if test="delYn != null and delYn !=''">
+                AND A.DEL_YN = #{delYn}
+            </if>
+	</select>
+	
+	<select id="selectDeptList" resultMap="deptMap">
+	    SELECT 
+	        DEPT_CD,
+	        DEPT_NAME,
+	        UP_DEPT_NAME,
+	        CASE 
+	            WHEN USER_COUNT = 0 THEN '-'
+	            ELSE TO_CHAR(USER_COUNT)
+	        END AS USER_COUNT,
+	        DEL_YN,
+	        REG_DT
+	    FROM (
+	        SELECT 
+	            ROW_NUMBER() OVER (ORDER BY A.DEPT_CD) AS RN,
+	            A.DEPT_CD,
+	            A.DEPT_NAME,
+	            C.DEPT_NAME AS UP_DEPT_NAME, 
+	            NVL(U.USER_COUNT, 0) AS USER_COUNT,
+	            A.DEL_YN,
+	            TO_CHAR(A.REG_DT,'YYYY-MM-DD') REG_DT
+	        FROM 
+	            TB_DEPT_INFO A
+	        LEFT JOIN (
+	            SELECT 
+	                B.DEPT_CD,
+	                COUNT(B.DEPT_CD) AS USER_COUNT
+	            FROM 
+	                TB_USER_INFO B
+	            WHERE 
+	             	LEAVE_YN = 'N'
+	            GROUP BY 
+	                B.DEPT_CD
+	        ) U ON A.DEPT_CD = U.DEPT_CD
+	        LEFT JOIN 
+	            TB_DEPT_INFO C ON A.UP_DEPT_CD = C.DEPT_CD 
+	        WHERE 
+	            1=1
+	            <if test="deptName != null and deptName != ''">
+	                AND A.DEPT_NAME LIKE '%' || #{deptName} || '%'
+	            </if>
+	            <if test="delYn != null and delYn !=''">
+	                AND A.DEL_YN = #{delYn}
+	            </if>
+	     ) 
+	    WHERE 
+	        RN <![CDATA[ > ]]> (#{currentPage} - 1) * #{countPerPage}
+	        AND RN <![CDATA[ <= ]]> #{currentPage} * #{countPerPage}
+</select>
+
+	
+	<select id = "selectDeptDtlData" resultMap = "deptMap">
+		SELECT
+		    A.DEPT_CD,
+		    A.DEPT_NAME,
+		    B.DEPT_NAME AS UP_DEPT_NAME,
+		    A.DEL_YN,
+		    A.UP_DEPT_CD
+		FROM
+		    TB_DEPT_INFO A
+		LEFT JOIN
+		    TB_DEPT_INFO B ON A.UP_DEPT_CD = B.DEPT_CD
+		WHERE
+		    A.DEPT_CD = #{deptCd}
+	</select>
+	
+	
+	<select id="selectUpDept" resultMap="deptMap">
+	    SELECT
+            DEPT_CD,
+            DEPT_NAME
+        FROM
+            TB_DEPT_INFO 
+
+	</select>
+	
+	<insert id="InsertOrSelectDeptdata">
+		MERGE INTO TB_DEPT_INFO 
+			USING DUAL
+			ON (DEPT_CD = #{deptCd} )
+			WHEN MATCHED THEN
+			    UPDATE
+			    SET
+		               DEPT_NAME =#{deptName},
+		               UP_DEPT_CD = #{upDeptCd},
+		               DEL_YN = #{delYn}, 
+		               UPD_DT = SYSDATE,
+		               UPD_USER_ID = #{updUserId}
+			WHEN NOT MATCHED THEN
+			    INSERT 
+			    (
+			        DEPT_CD,
+	                DEPT_NAME,
+	                UP_DEPT_CD,
+			        DEL_YN,
+			        REG_DT,
+			        REG_USER_ID
+			    )
+			    VALUES 
+			    (
+		            #{deptCd},
+	                #{deptName},
+	                #{upDeptCd},
+			        'N',
+			        SYSDATE,
+			        #{updUserId}
+			    )
+	</insert>
+	
+	
+	
+	
+</mapper>

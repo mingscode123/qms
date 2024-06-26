@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.user.dao.UserDao">
+	
+	<resultMap type="com.qms.user.vo.UserVO" id="userMap">
+		<result property="userId" 				column="USER_ID"/>
+		<result property="userPwd" 				column="USER_PWD"/>
+		<result property="userName"				column="USER_NAME"/>
+		<result property="phone" 				column="PHONE"/>
+		<result property="email" 				column="EMAIL"/>
+		<result property="deptCd" 				column="DEPT_CD" />
+		<result property="positionCd" 			column="POSITION_CD" />
+		<result property="leaveYn" 				column="LEAVE_YN" />
+		<result property="leaveDt" 				column="LEAVE_DT" />		
+		<result property="deptName" 			column="DEPT_NAME" />	
+		<result property="comName" 				column="COM_NAME" />	
+		<result property="comGrpCd" 			column="COM_GRP_CD" />	
+		<result property="regDt"      			column="REG_DT" />
+	    <result property="regUserId"  			column="REG_USER_ID" />
+	    <result property="updDt"       			column="UPD_DT" />
+	    <result property="updUserId"   			column="UP_USER_ID" />
+	  	<result property="regDtFrom"      			column="REG_DT_FROM" />
+	  	<result property="regDtTo"      			column="REG_DT_TO" />
+	</resultMap>
+	
+	<select id="selectTotalUserCount" resultType="integer">
+		SELECT COUNT(*)
+		FROM 
+			TB_USER_INFO A
+		INNER JOIN 
+		    TB_DEPT_INFO B ON A.DEPT_CD = B.DEPT_CD
+		INNER JOIN 
+		    TB_COM_CODE C ON A.POSITION_CD = C.COM_CD
+		WHERE 1=1
+		<if test="userName!=null and userName!=''">
+		AND USER_NAME LIKE'%'||#{userName}||'%'
+		</if>
+		AND C.COM_GRP_CD = #{comGrpCd}
+</select>
+
+<select id="selectUserList" resultMap="userMap">
+	SELECT 
+			    USER_ID,
+			    USER_NAME,
+			    DEPT_NAME,
+                DEPT_CD,
+			    COM_NAME,
+                POSITION_CD,
+			    PHONE,
+			    EMAIL,
+			    LEAVE_DT,
+			    LEAVE_YN,
+			    REG_DT
+			FROM (
+			    SELECT 
+			        ROWNUM RN,
+			        A.USER_ID,
+			        A.USER_NAME,
+			        B.DEPT_NAME,
+                    B.DEPT_CD,
+			        C.COM_NAME,
+                    (C.COM_CD)POSITION_CD,
+			        A.PHONE,
+			        A.EMAIL,
+			        NVL(TO_CHAR(A.LEAVE_DT, 'YYYY-MM-DD'), '-') AS LEAVE_DT,
+			        A.LEAVE_YN,
+			        NVL(TO_CHAR(A.REG_DT, 'YYYY-MM-DD'), '-') AS REG_DT
+			    FROM 
+			        TB_USER_INFO A
+			    INNER JOIN 
+			        TB_DEPT_INFO B ON A.DEPT_CD = B.DEPT_CD
+			    INNER JOIN 
+			        TB_COM_CODE C ON A.POSITION_CD = C.COM_CD
+			    WHERE 1=1
+			    AND C.COM_GRP_CD = 'US01'
+			    <if test="userName !=null and userName !=''">
+			    AND USER_Name = #{userName}
+			    </if>
+			    <if test="leaveYn !=null and leaveYn !=''">
+			    AND LEAVE_YN = #{leaveYn}
+			    </if>
+			    <if test="regDtFrom != null and regDtFrom != ''">
+	            AND TO_CHAR(A.REG_DT, 'yyyy-mm-dd') <![CDATA[>=]]> #{regDtFrom}
+		        </if>
+		        <if test="regDtTo != null and regDtTo != ''">
+		        AND TO_CHAR(A.REG_DT, 'yyyy-mm-dd') <![CDATA[<=]]> #{regDtTo}
+		        </if>
+			) 
+			WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+			AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+	</select>
+	
+	<select id="selectGetUserDtlData" resultMap="userMap">
+			    SELECT 
+			        A.USER_ID,
+			        A.USER_NAME,
+			        B.DEPT_NAME,
+                    B.DEPT_CD,
+			        C.COM_NAME,
+                    (C.COM_CD)POSITION_CD,
+			        A.PHONE,
+			        A.EMAIL,
+			        NVL(TO_CHAR(A.LEAVE_DT, 'YYYY-MM-DD'), '-') AS LEAVE_DT,
+			        A.LEAVE_YN,
+			        NVL(TO_CHAR(A.REG_DT, 'YYYY-MM-DD'), '-') AS REG_DT
+			    FROM 
+			        TB_USER_INFO A
+			    INNER JOIN 
+			        TB_DEPT_INFO B ON A.DEPT_CD = B.DEPT_CD
+			    INNER JOIN 
+			        TB_COM_CODE C ON A.POSITION_CD = C.COM_CD
+			    WHERE 1=1
+			    AND C.COM_GRP_CD = 'US01'
+				AND A.USER_ID = #{userId}
+	</select>
+	
+	<select id="selectDeptList" resultMap="userMap">
+		SELECT DEPT_CD, DEPT_NAME
+			FROM TB_DEPT_INFO
+	</select>
+
+	
+	<select id="selectUserListTOexcel" resultMap="userMap">
+			SELECT 
+				A.USER_ID,
+			    A.USER_NAME,
+			    B.DEPT_NAME,
+			    C.COM_NAME, 
+			    A.LEAVE_YN,
+			    A.EMAIL,
+                A.PHONE,
+                TO_CHAR(A.LEAVE_DT, 'YYYY-MM-DD') LEAVE_DT
+			FROM 
+			    TB_USER_INFO A
+			INNER JOIN 
+			    TB_DEPT_INFO B ON A.DEPT_CD = B.DEPT_CD
+			INNER JOIN 
+			    TB_COM_CODE C ON A.POSITION_CD = C.COM_CD
+			WHERE 1=1
+			<if test="userName!=null and userName!=''">
+			AND USER_NAME LIKE '%'||#{userName}||'%'
+			</if>
+			AND C.COM_GRP_CD = #{comGrpCd}
+	</select>
+	
+	<update id ="updateUserdata">
+		UPDATE TB_USER_INFO
+			SET 
+			    USER_NAME = #{userName},
+			    DEPT_CD = #{deptCd},
+			    <if test="userPwd !=null and userPwd !=''">
+			    USER_PWD = #{userPwd},
+			    </if>
+			    PHONE = #{phone},
+			    EMAIL = #{email},
+			    LEAVE_YN = #{leaveYn},
+			    <if test="leaveDt !=null and leaveDt !=''">
+			    LEAVE_DT = #{leaveDt},
+			     </if>
+			    UPD_DT = SYSDATE,
+			    UPD_USER_ID = #{updUserId}
+			WHERE 
+			    USER_ID = #{userId}
+	</update>
+	
+	<insert id ="insertNewUserdata">
+		INSERT INTO 
+			TB_USER_INFO(USER_ID, USER_NAME, DEPT_CD, USER_PWD, PHONE, EMAIL, LEAVE_YN, REG_DT, REG_USER_ID,POSITION_CD)   
+		VALUES
+			(#{userId},#{userName},#{deptCd},#{userPwd},#{phone},#{email},'N', SYSDATE, #{regUserId},#{positionCd})
+	</insert>
+	
+	<select id = "selectchkId" resultType = "String">
+		SELECT USER_ID
+		FROM TB_USER_INFO
+		WHERE USER_ID = #{userId}
+	</select>
+	
+</mapper>

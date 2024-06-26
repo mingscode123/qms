@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.partner.dao.PartnerDao">
+	
+	<resultMap type="com.qms.partner.vo.PartnerVO" id="partnerMap">
+	
+		<result property="compCd" 					column="COMP_CD"/>
+		<result property="compName" 				column="COMP_NAME"/>
+		<result property="compType" 				column="COMP_TYPE"/>
+		<result property="bizNo"					column="BIZ_NO"/>
+		<result property="tradeYn" 					column="TRADE_YN"/>
+		<result property="compCeo" 					column="COMP_CEO"/>
+		<result property="phone" 					column="PHONE" />
+		<result property="email" 					column="EMAIL" />
+		<result property="addr" 					column="ADDR" />
+		<result property="mgrName" 					column="MGR_NAME" />		
+		<result property="mgrPosition" 				column="MGR_POSITION" />	
+		<result property="mgrPhone" 				column="MGR_PHONE" />	
+		<result property="delYn" 					column="DEL_YN" />	
+		<result property="regDt"      				column="REG_DT" />
+	    <result property="regUserId"  				column="REG_USER_ID" />
+	    <result property="updDt"       				column="UPD_DT" />
+	    <result property="updUserId"   				column="UP_USER_ID" />
+	    <result property="itemName" 				column="ITEM_NAME" />
+		<result property="boxType" 					column="BOX_TYPE" />
+		<result property="boxQty"					column="BOX_QTY" />
+		<result property="itemCd" 					column="ITEM_CD" />
+		<result property="inPrice" 					column="IN_PRICE" />
+		<result property="location" 				column="LOCATION" />
+		<result property="weight" 					column="WEIGHT" />
+	    
+	</resultMap>
+	
+	<resultMap type="com.qms.item.vo.ItemVO" id="itemMap">
+		<result property="itemCd" 					column="ITEM_CD"/>
+		<result property="itemName" 				column="ITEM_NAME"/>
+		<result property="itemType"					column="ITEM_TYPE"/>
+		<result property="unitType" 				column="UNIT_TYPE"/>
+		<result property="hscode" 					column="HSCODE"/>
+		<result property="boxType" 					column="BOX_TYPE" />
+		<result property="boxQty" 					column="BOX_QTY" />
+		<result property="weight" 					column="WEIGHT" />
+		<result property="plantLine" 				column="PLANT_LINE" />		
+		<result property="unitPrice" 				column="UNIT_PRICE" />	
+		<result property="location" 				column="LOCATION" />	
+		<result property="subconYn" 				column="SUBCON_YN" />	
+		<result property="regDt"      				column="REG_DT" />
+		<result property="userId"  				column="USER_ID" />
+	    <result property="regUserId"  				column="REG_USER_ID" />
+	    <result property="updDt"       				column="UPD_DT" />
+	    <result property="updUserId"   				column="UP_USER_ID" />
+	  	<result property="comName" 					column="COM_NAME" />	
+		<result property="comGrpCd" 				column="COM_GRP_CD" />	
+	    
+	</resultMap>
+	
+	<select id="selectTotalPartnerCount" resultType="integer">
+	
+		SELECT COUNT(*)
+		FROM 
+			TB_PARTNER_INFO
+		WHERE 1=1
+		<if test="compCd!=null and compCd!=''">
+		AND COMP_CD LIKE '%'||#{compCd}||'%'
+		</if>
+		<if test="compName!=null and compName!=''">
+		AND COMP_NAME LIKE '%'||#{compName}||'%'
+		</if>
+		<if test="compType!=null and compType!=''">
+		AND COMP_TYPE LIKE '%'||#{compType}||'%'
+		</if>
+		<if test="regDtFrom!=null and regDtFrom!=''">
+  		AND TO_CHAR(REG_DT,'yyyy-mm-dd') <![CDATA[ >= ]]> #{regDtFrom}
+  		</if>
+  		<if test="regDtTo!=null and regDtTo!=''">
+  		AND TO_CHAR(REG_DT,'yyyy-mm-dd') <![CDATA[ <= ]]> #{regDtTo}
+  		</if>
+  		
+	</select>
+	
+	<select id="selectPartnerList" resultMap="partnerMap">
+	
+		SELECT 
+			COMP_CD,
+			COMP_NAME,
+			COMP_TYPE,
+			BIZ_NO,
+			TRADE_YN,
+			COMP_CEO,
+			PHONE,
+			EMAIL,
+			ADDR,
+			MGR_NAME,
+			MGR_POSITION,
+			MGR_PHONE,
+			DEL_YN,
+			REG_DT
+		FROM (
+			SELECT 
+				ROW_NUMBER() OVER(ORDER BY REG_DT DESC) RN,
+				COMP_CD,
+				COMP_NAME,
+				DECODE(COMP_TYPE, 'S', '공급사', 'C', '고객사', COMP_TYPE) AS COMP_TYPE,
+				BIZ_NO,
+				TRADE_YN,
+				COMP_CEO,
+				PHONE,
+				EMAIL,
+				ADDR,
+				MGR_NAME,
+				MGR_POSITION,
+				MGR_PHONE,
+				DEL_YN,
+				TO_CHAR(REG_DT, 'YYYY-MM-DD') AS REG_DT
+				FROM TB_PARTNER_INFO
+			WHERE 1=1
+			<if test="compCd!=null and compCd!=''">
+			AND COMP_CD LIKE '%'||#{compCd}||'%'
+			</if>
+			<if test="compName!=null and compName!=''">
+			AND COMP_NAME LIKE '%'||#{compName}||'%'
+			</if>
+			<if test="compType!=null and compType!=''">
+			AND COMP_TYPE LIKE '%'||#{compType}||'%'
+			</if>
+			<if test="regDtFrom!=null and regDtFrom!=''">
+	  		AND TO_CHAR(REG_DT,'yyyy-mm-dd') <![CDATA[ >= ]]> #{regDtFrom}
+	  		</if>
+	  		<if test="regDtTo!=null and regDtTo!=''">
+	  		AND TO_CHAR(REG_DT,'yyyy-mm-dd') <![CDATA[ <= ]]> #{regDtTo}
+  		</if>
+					
+			)
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+	
+	</select>
+	
+	<!-- 모달 -->
+	
+	<select id = "selectPartnerDtldata" resultMap = "partnerMap">
+		SELECT
+		    COMP_CD,
+			COMP_NAME,
+			COMP_TYPE,
+			BIZ_NO,
+			TRADE_YN,
+			COMP_CEO,
+			PHONE,
+			EMAIL,
+			ADDR,
+			MGR_NAME,
+			MGR_POSITION,
+			MGR_PHONE
+		FROM
+		    TB_PARTNER_INFO
+		WHERE
+		    COMP_CD = #{compCd}
+	</select>
+	
+	<select id = "selectPartnerItemList" resultMap = "itemMap">
+		SELECT
+		    A.ITEM_CD,
+		    A.ITEM_NAME,
+		    D1.COM_NAME AS BOX_TYPE,
+		    A.BOX_QTY,
+		    A.WEIGHT,
+		    A.UNIT_PRICE,
+		    D2.COM_NAME AS LOCATION
+		FROM TB_ITEM_INFO A
+		INNER JOIN
+		   TB_PARTNER_ITEM C ON A.ITEM_CD = C.ITEM_CD
+		INNER JOIN 
+			TB_PARTNER_INFO B ON B.COMP_CD = C.COMP_CD
+		INNER JOIN
+			 TB_COM_CODE D1 ON D1.COM_GRP_CD = 'IT03' AND A.BOX_TYPE = D1.COM_CD
+		INNER JOIN 
+			TB_COM_CODE D2 ON D2.COM_GRP_CD = 'IT05' AND A.LOCATION = D2.COM_CD
+		WHERE B.COMP_CD = #{compCd}  
+ 		AND D1.COM_GRP_CD IN 
+	    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+	        #{comGrpCd}
+	    </foreach>
+	     AND D2.COM_GRP_CD IN 
+	    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+	        #{comGrpCd}	 
+        </foreach>               
+	</select>
+	
+	<insert id="InsertOrSelectPartnerdata">
+		MERGE INTO TB_PARTNER_INFO 
+		USING DUAL
+		ON (COMP_CD = #{compCd})
+		WHEN MATCHED THEN
+		    UPDATE
+		    SET
+		        <if test="compName != null and compName != '' ">
+		        COMP_NAME = #{compName},
+		        </if>
+		        
+		        <if test="compType != null and compType != '' ">
+		        COMP_TYPE = #{compType},
+		        </if>
+		        
+		        <if test="bizNo != null and bizNo != '' "> 
+		        BIZ_NO = #{bizNo},
+		        </if>
+		        
+		        <if test="tradeYn !=null and tradeYn != '' ">
+		        TRADE_YN = #{tradeYn},
+		        </if>
+		        
+		        <if test="compCeo !=null and compCeo != '' "> 
+		        COMP_CEO = #{compCeo},
+		        </if>
+		        
+		        <if test="phone !=null and phone != '' "> 
+		        PHONE = #{phone},
+		        </if>
+		        
+		        <if test="email !=null and email != '' ">
+		        EMAIL = #{email},
+		        </if>
+		        
+		        <if test="addr !=null and addr != '' "> 
+		        ADDR = #{addr},
+		        </if>
+		        
+		        <if test="mgrName !=null and mgrName != '' "> 
+		        MGR_NAME = #{mgrName},
+		        </if>
+		        
+		        <if test="mgrPosition !=null and mgrPosition != '' "> 
+		        MGR_POSITION = #{mgrPosition},
+		        </if>
+		        
+		        <if test="mgrPhone != null and mgrPhone != '' "> 
+		        MGR_PHONE = #{mgrPhone},
+		        </if>
+		        
+		        <if test="delYn != null and delYn !='' "> 
+		        DEL_YN = #{delYn},
+		        </if>
+		        
+		        UPD_DT = SYSDATE,
+		        
+		        <if test="updUserId != null and updUserId !='' "> 
+		        UPD_USER_ID = #{updUserId},
+		        </if>
+		        REG_DT = REG_DT
+		WHEN NOT MATCHED THEN
+		    INSERT 
+		    (
+		        COMP_CD,
+		        COMP_NAME,
+		        COMP_TYPE,
+		        BIZ_NO,
+		        TRADE_YN,
+		        COMP_CEO,
+		        PHONE,
+		        EMAIL,
+		        ADDR,
+		        MGR_NAME,
+		        MGR_POSITION,
+		        MGR_PHONE,
+		        DEL_YN,
+		        REG_DT,
+		        REG_USER_ID
+		    )
+		    VALUES 
+		    (
+		        #{compCd},
+		        #{compName},
+		        #{compType},
+		        #{bizNo},
+		        #{tradeYn},
+		        #{compCeo},
+		        #{phone},
+		        #{email},
+		        #{addr},
+		        #{mgrName},
+		        #{mgrPosition},
+		        #{mgrPhone},
+		        'N',
+		        SYSDATE,
+		        #{regUserId}
+		    )
+
+	</insert>
+	
+	<delete id="deletePartnerItem">
+		DELETE 
+		FROM TB_PARTNER_ITEM 
+		WHERE COMP_CD = #{compCd}
+	</delete>
+	
+	<update id="insertPartnerItem">
+    
+        <foreach collection="itemlist" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">
+            INTO TB_PARTNER_ITEM (
+                COMP_CD,
+                ITEM_CD,
+                DEL_YN,
+                REG_DT,
+                REG_USER_ID
+            )
+            VALUES (
+                #{compCd},
+                #{item.itemCd},
+                'N', 
+                SYSDATE, 
+                #{regUserId}
+            )
+        </foreach>
+    
+	</update>
+
+
+	
+	
+</mapper>

@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.item.dao.ItemDao">
+	
+	<resultMap type="com.qms.item.vo.ItemVO" id="itemMap">
+		<result property="itemCd" 					column="ITEM_CD"/>
+		<result property="itemName" 				column="ITEM_NAME"/>
+		<result property="itemType"					column="ITEM_TYPE"/>
+		<result property="unitType" 				column="UNIT_TYPE"/>
+		<result property="hscode" 					column="HSCODE"/>
+		<result property="boxType" 					column="BOX_TYPE" />
+		<result property="boxQty" 					column="BOX_QTY" />
+		<result property="weight" 					column="WEIGHT" />
+		<result property="plantLine" 				column="PLANT_LINE" />		
+		<result property="unitPrice" 				column="UNIT_PRICE" />	
+		<result property="location" 				column="LOCATION" />	
+		<result property="subconYn" 				column="SUBCON_YN" />	
+		<result property="regDt"      				column="REG_DT" />
+		<result property="userId"  					column="USER_ID" />
+	    <result property="regUserId"  				column="REG_USER_ID" />
+	    <result property="updDt"       				column="UPD_DT" />
+	    <result property="updUserId"   				column="UP_USER_ID" />
+	  	<result property="comName" 					column="COM_NAME" />	
+		<result property="comGrpCd" 				column="COM_GRP_CD" />	
+	    
+	</resultMap>
+	
+<select id="selectTotalItemCount" resultType="integer">
+	
+		 SELECT COUNT(*)
+		    FROM TB_ITEM_INFO A
+		    INNER JOIN 
+				TB_COM_CODE B1 ON B1.COM_GRP_CD = 'IT01' AND A.ITEM_TYPE = B1.COM_CD
+		    INNER JOIN 
+				TB_COM_CODE B2 ON B2.COM_GRP_CD = 'IT02' AND A.UNIT_TYPE = B2.COM_CD
+			INNER JOIN
+				TB_COM_CODE B3 ON B3.COM_GRP_CD = 'IT04' AND A.PLANT_LINE = B3.COM_CD
+			INNER JOIN 
+                TB_COM_CODE B4 ON B4.COM_GRP_CD = 'IT05' AND A.LOCATION = B4.COM_CD
+            INNER JOIN 
+                TB_COM_CODE B5 ON B5.COM_GRP_CD = 'IT03' AND A.BOX_TYPE = B5.COM_CD    
+		    WHERE 1=1
+		    <if test="itemCd != null and itemCd !=''">
+		        AND A.ITEM_CD LIKE '%' || #{itemCd} || '%'
+		    </if>
+		    <if test="itemName != null and itemName !=''">
+		        AND A.ITEM_NAME LIKE '%' || #{itemName} || '%'
+		    </if>
+		    <if test="itemType != null and itemType !=''">
+		        AND A.ITEM_TYPE = #{itemType}
+		    </if>
+		    AND B1.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		    AND B2.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		    AND B3.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+    		</foreach>
+    		AND B4.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+    		</foreach>
+  		
+	</select>
+	
+	<select id="selectItemList" resultMap="itemMap">
+		SELECT 
+		   	ITEM_CD, 
+		    ITEM_NAME,
+		    WEIGHT,
+		    UNIT_PRICE,
+		    ITEM_TYPE,
+		    UNIT_TYPE,
+		    PLANT_LINE,
+		    LOCATION,
+		    BOX_TYPE,
+		    BOX_QTY,
+		    REG_DT
+	    FROM(
+			 SELECT 
+				ROWNUM AS RN,
+			    A.ITEM_CD, 
+			    A.ITEM_NAME,
+			    A.WEIGHT,
+			    A.UNIT_PRICE,
+			    B1.COM_NAME AS ITEM_TYPE,
+                B2.COM_NAME AS UNIT_TYPE,
+                B3.COM_NAME AS PLANT_LINE,
+                B4.COM_NAME AS LOCATION,
+			    B5.COM_NAME AS BOX_TYPE,
+			    A.BOX_QTY,
+			    TO_CHAR(A.REG_DT, 'YYYY-MM-DD') AS REG_DT
+		    FROM
+		    	 TB_ITEM_INFO A
+    		INNER JOIN 
+				TB_COM_CODE B1 ON B1.COM_GRP_CD = 'IT01' AND A.ITEM_TYPE = B1.COM_CD
+			INNER JOIN 
+				TB_COM_CODE B2 ON B2.COM_GRP_CD = 'IT02' AND A.UNIT_TYPE = B2.COM_CD
+			INNER JOIN
+				TB_COM_CODE B3 ON B3.COM_GRP_CD = 'IT04' AND A.PLANT_LINE = B3.COM_CD
+			INNER JOIN 
+                TB_COM_CODE B4 ON B4.COM_GRP_CD = 'IT05' AND A.LOCATION = B4.COM_CD
+            INNER JOIN 
+                TB_COM_CODE B5 ON B5.COM_GRP_CD = 'IT03' AND A.BOX_TYPE = B5.COM_CD    
+			WHERE 1=1
+			<if test="itemCd != null and itemCd !=''">
+				AND A.ITEM_CD LIKE '%' || #{itemCd} || '%'
+			</if>
+			<if test="itemName != null and itemName !=''">
+				AND A.ITEM_NAME LIKE '%' || #{itemName} || '%'
+			</if>
+			<if test="itemType != null and itemType !=''">
+			    AND A.ITEM_TYPE = #{itemType}
+			</if>
+			AND B1.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		    AND B2.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		    AND B3.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		     AND B4.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		     AND B5.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		     ORDER BY A.REG_DT DESC
+			)
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+		
+	</select>
+	
+	<!--이 밑은 모달쪽 쿼리 위는 페이지쪽 쿼리 -->
+	
+	
+	<select id = "selectDuplicateItemCdCheck" resultType="Integer">
+		SELECT  
+			COUNT(*) 
+		FROM 
+			TB_ITEM_INFO
+		WHERE 
+			ITEM_CD =  #{itemCd}
+	</select>
+	
+	<select id = "selectItemDtlData" resultMap = "itemMap">
+		SELECT
+		    ITEM_NAME,
+		    ITEM_TYPE,
+		    UNIT_TYPE, 
+		    HSCODE, 
+		    BOX_TYPE,
+		    BOX_QTY, 
+		    WEIGHT, 
+		    PLANT_LINE, 
+		    UNIT_PRICE,
+		    LOCATION, 
+		    SUBCON_YN
+		FROM
+		    TB_ITEM_INFO
+		WHERE
+		    ITEM_CD = #{itemCd}
+	</select>
+	
+	<insert id = "insertNewItem">
+		INSERT INTO TB_ITEM_INFO(
+		    ITEM_CD,
+		    ITEM_NAME,
+		    ITEM_TYPE,
+		    UNIT_TYPE, 
+		    HSCODE, 
+		    BOX_TYPE,
+		    BOX_QTY, 
+		    WEIGHT, 
+		    PLANT_LINE, 
+		    UNIT_PRICE,
+		    LOCATION, 
+		    SUBCON_YN,
+		    REG_DT, 
+		    REG_USER_ID
+		)
+		VALUES (
+		    #{itemCd},
+		    #{itemName},
+		    #{itemType},
+		    #{unitType},
+		    #{hscode},
+		    #{boxType},
+		    #{boxQty},
+		    #{weight},
+		    #{plantLine},
+		    #{unitPrice},
+		    #{location},
+		    #{subconYn},
+		    SYSDATE,
+		    #{regUserId}
+		)
+	</insert>
+	
+	<update id = "updateItemData">
+		UPDATE 
+			TB_ITEM_INFO
+			SET
+			    ITEM_NAME = #{itemName},
+			    ITEM_TYPE = #{itemType},
+			    UNIT_TYPE = #{unitType},
+			    HSCODE = #{hscode},
+			    BOX_TYPE = #{boxType},
+			    BOX_QTY = #{boxQty},
+			    WEIGHT = #{weight},
+			    PLANT_LINE = #{plantLine},
+			    UNIT_PRICE = #{unitPrice},
+			    LOCATION = #{location},
+			    SUBCON_YN =  #{subconYn},
+			    UPD_DT = SYSDATE,
+			    UPD_USER_ID = #{updUserId}
+			WHERE
+			    ITEM_CD = #{itemCd}
+	</update>
+	
+	<delete id ="deleteitemCd">
+	DELETE FROM TB_ITEM_INFO
+	WHERE ITEM_CD = #{itemCd}
+	</delete>
+	
+	<update  id="insertExcelFile">
+    <foreach collection="list" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">
+	INTO TB_ITEM_INFO(
+    <if test="item.itemCd!=null and item.itemCd!=''">ITEM_CD,</if>
+    <if test="item.itemName!=null and item.itemName!=''">ITEM_NAME,</if>
+    <if test="item.itemType!=null and item.itemType!=''">ITEM_TYPE,</if>
+    <if test="item.unitType!=null and item.unitType!=''">UNIT_TYPE, </if>
+    <if test="item.hscode!=null and item.hscode!=''">HSCODE,</if>
+    <if test="item.boxType!=null and item.boxType!=''">BOX_TYPE,</if>
+    <if test="item.boxQty!=null and item.boxQty!=''">BOX_QTY,</if>
+    <if test="item.weight!=null and item.weight!=''">WEIGHT,</if>
+    <if test="item.plantLine!=null and item.plantLine!=''">PLANT_LINE,</if>
+    <if test="item.unitPrice!=null and item.unitPrice!=''">UNIT_PRICE,</if>
+    <if test="item.location!=null and item.location!=''">LOCATION,</if>
+    <if test="item.subconYn!=null and item.subconYn!=''">SUBCON_YN,</if>
+    REG_DT,
+    REG_USER_ID
+)
+VALUES (
+    <if test="item.itemCd!=null and item.itemCd!=''">#{item.itemCd},</if>
+    <if test="item.itemName!=null and item.itemName!=''">#{item.itemName},</if>
+    <if test="item.itemType!=null and item.itemType!=''">#{item.itemType},</if>
+    <if test="item.unitType!=null and item.unitType!=''">#{item.unitType},</if>
+    <if test="item.hscode!=null and item.hscode!=''">#{item.hscode},</if>
+    <if test="item.boxType!=null and item.boxType!=''">#{item.boxType},</if>
+    <if test="item.boxQty!=null and item.boxQty!=''">#{item.boxQty},</if>
+    <if test="item.weight!=null and item.weight!=''">#{item.weight},</if>
+    <if test="item.plantLine!=null and item.plantLine!=''">#{item.plantLine},</if>
+    <if test="item.unitPrice!=null and item.unitPrice!=''">#{item.unitPrice},</if>
+    <if test="item.location!=null and item.location!=''">#{item.location},</if>
+    <if test="item.subconYn!=null and item.subconYn!=''">#{item.subconYn},</if>
+    SYSDATE,
+    #{item.regUserId}
+    
+)
+    		</foreach>
+		</update>
+	
+	
+</mapper>

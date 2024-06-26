@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.pdf.dao.ItextPdfDao">
+
+		<resultMap type="com.qms.pdf.vo.ItextPdfVO" id="pdfMap">
+		<result property="invoiceNo" column="INVOICE_NO" />
+		<result property="shipper" column="SHIPPER" />
+		<result property="consignee" column="CONSIGNEE" />
+		<result property="notiParty" column="NOTI_PARTY" />
+		<result property="portLoad" column="PORT_LOAD" />
+		<result property="finalDest" column="FINAL_DEST" />
+		<result property="remark" column="REMARK" />
+	</resultMap>
+		
+	<select id="selectInvoiceData" resultMap="pdfMap">
+		SELECT INVOICE_NO, SHIPPER, CONSIGNEE, NOTI_PARTY, PORT_LOAD, FINAL_DEST,NVL(REMARK,'-')REMARK
+		    FROM TB_RCV_INFO
+		    WHERE INVOICE_NO = #{invoiceNo}
+	</select>
+
+
+</mapper>

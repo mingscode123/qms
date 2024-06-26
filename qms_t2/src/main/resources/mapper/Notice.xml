@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.approve.dao.NoticeDao">
+
+		<resultMap type="com.qms.approve.vo.NoticeVO" id="NoticeMap">
+		    <result property="noticeSeq"    column="NOTICE_SEQ" />
+		    <result property="userId"       column="USER_ID" />
+		    <result property="noticeType"   column="NOTICE_TYPE" />
+		    <result property="title"        column="TITLE" />
+		    <result property="content"      column="CONTENT" />
+		    <result property="filePath"     column="FILE_PATH" />
+		    <result property="fileName"     column="FILE_NAME" />
+		    <result property="delYn"        column="DEL_YN" />
+		    <result property="regDt"        column="REG_DT" />
+		    <result property="regUserId"    column="REG_USER_ID" />
+		    <result property="updDt"        column="UPD_DT" />
+		    <result property="updUserId"    column="UP_USER_ID" />
+		    <result property="deptName"     column="DEPT_NAME" />
+		    <result property="userName"     column="USER_NAME" />
+		    
+		    <result property="comName"     column="COM_NAME" />
+		    <result property="comCd"     column="COM_CD" />
+		    
+		    
+		</resultMap>
+		
+<select id="selectTotalNoticeCount" resultType="integer">
+
+		SELECT COUNT(*)
+		FROM 
+		    TB_NOTICE_INFO A
+		INNER JOIN 
+		    TB_USER_INFO C ON A.USER_ID = C.USER_ID
+		INNER JOIN 
+		    TB_DEPT_INFO B ON C.DEPT_CD = B.DEPT_CD
+		WHERE
+		    1=1
+		<if test="title != null and title !=''">
+		    AND A.TITLE LIKE '%' || #{title} || '%'
+		</if>
+		<if test="noticeType != null and noticeType !=''">
+		    AND A.NOTICE_TYPE = #{noticeType}
+		</if> 
+		    
+  		
+	</select>
+	
+<select id="selectNoticeList" resultMap="NoticeMap">
+	  SELECT 
+	  		NOTICE_SEQ,
+		    COM_NAME,
+	    	TITLE,
+		    DEPT_NAME,
+		    USER_NAME,
+		    FILE_PATH,
+		    FILE_NAME,
+		    REG_DT
+  	   FROM (
+			SELECT 
+				ROWNUM RN,
+				A.NOTICE_SEQ,
+			    D.COM_NAME,
+			    A.TITLE,
+			    C.DEPT_NAME,
+			    B.USER_NAME,
+			    A.FILE_PATH,
+			    A.FILE_NAME,
+			    TO_CHAR(A.REG_DT, 'YYYY-MM-DD') REG_DT
+			FROM 
+			    TB_NOTICE_INFO A,
+                TB_USER_INFO B,
+                TB_DEPT_INFO C,
+                TB_COM_CODE D
+            WHERE
+                A.USER_ID = B.USER_ID
+            AND
+                B.DEPT_CD = C.DEPT_CD
+            AND
+                A.NOTICE_TYPE = D.COM_CD
+			AND
+			    1=1
+			AND 
+				D.COM_GRP_CD = 'NT01'
+			<if test="title != null and title !=''">
+			    AND A.TITLE LIKE '%' || #{title} || '%'
+			</if>
+			<if test="noticeType != null and noticeType !=''">
+			    AND A.NOTICE_TYPE = #{noticeType}
+			</if>
+			)
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+
+</select>
+
+<insert id = "insertNoticeData">
+	INSERT INTO TB_NOTICE_INFO
+	  (	NOTICE_SEQ, 
+		USER_ID, 
+		NOTICE_TYPE,
+		 TITLE, 
+		 CONTENT, 
+		<if test="filePath != null and filePath !=''">
+		FILE_PATH, 
+		FILE_NAME, 
+		</if>
+		DEL_YN, 
+		REG_DT,
+		REG_USER_ID
+	  )
+	VALUES 
+ 	  (
+		(SELECT MAX(NOTICE_SEQ) + 1 FROM TB_NOTICE_INFO),
+		#{userId},
+		#{noticeType},
+		#{title},
+		#{content},
+		<if test="filePath != null and filePath !=''">
+		#{filePath},
+		#{fileName},
+		</if>
+		'N',
+		SYSDATE,
+		#{userId} 
+     )
+</insert>
+<select id="selectNoticeDetail" resultMap="NoticeMap">
+		SELECT 
+			A.NOTICE_TYPE,
+			A.TITLE,
+			B.COM_NAME,
+			A.CONTENT,
+			A.FILE_NAME,
+			A.FILE_PATH
+		FROM 
+			TB_NOTICE_INFO A, 
+			TB_COM_CODE B
+		WHERE
+			A.NOTICE_TYPE = B.COM_CD
+		AND 
+			A.NOTICE_SEQ = #{noticeSeq}
+		AND 
+			B.COM_GRP_CD = 'NT01'
+</select>
+
+		
+
+
+</mapper>

@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.order.dao.OrderDao">
+
+	<resultMap type="com.qms.order.vo.OrderVO" id="OrderMap">
+        <result property="orderNo" column="ORDER_NO" />
+        <result property="compCd" column="COMP_CD" />
+        <result property="orderStatus" column="ORDER_STATUS" />
+        <result property="regDt" column="REG_DT" />
+        <result property="regUserId" column="REG_USER_ID" />
+        <result property="updDt" column="UPD_DT" />
+        <result property="updUserId" column="UPD_USER_ID" />
+        <result property="itemCd" column="ITEM_CD" />
+        <result property="orderQty" column="ORDER_QTY" />
+        <result property="orderPrice" column="ORDER_PRICE" />
+        <result property="deliveryDt" column="DELIVERY_DT" />
+        
+        <result property="deliveryDtFrom" column="DELIVERY_DT_FROM" />
+        <result property="deliveryDtTo" column="DELIVERY_DT_TO" />
+        
+        <result property="itemName" column="ITEM_NAME" />
+        <result property="boxType" column="BOX_TYPE" />
+        <result property="boxQty" column="BOX_QTY" />
+        <result property="compName" column="COMP_NAME" />
+        <result property="unitPrice" column="UNIT_PRICE" />
+    </resultMap>
+    
+	<select id="selectTotalOrderCount" resultType="integer">
+	    SELECT 
+	        COUNT(*)
+	    FROM
+	        TB_ORDER_INFO A,
+	        (
+	            SELECT  
+	                C.ORDER_NO,
+	                D.ITEM_NAME,
+	                D.UNIT_PRICE,
+	                C.ORDER_QTY,
+	                C.ORDER_PRICE,
+	                C.ITEM_CD 
+	            FROM 
+	                TB_ITEM_INFO D, 
+	                TB_ORDER_ITEM C 
+	            WHERE 
+	                D.ITEM_CD = C.ITEM_CD
+	        ) B
+	    WHERE
+	        A.ORDER_NO = B.ORDER_NO
+	        <if test="compName != null and compName != ''">
+	            AND (SELECT C.COMP_NAME FROM TB_PARTNER_INFO C WHERE C.COMP_CD = A.COMP_CD) LIKE '%' || #{compName} || '%'
+	        </if>
+	        <if test="itemCd != null and itemCd != ''">
+	            AND B.ITEM_CD LIKE '%' || #{itemCd} || '%'
+	        </if>
+	        <if test="deliveryDtFrom != null and deliveryDtFrom != ''">
+	            AND TO_CHAR(A.DELIVERY_DT, 'yyyy-mm-dd') <![CDATA[>=]]> #{deliveryDtFrom}
+	        </if>
+	        <if test="deliveryDtTo != null and deliveryDtTo != ''">
+	            AND TO_CHAR(A.DELIVERY_DT, 'yyyy-mm-dd') <![CDATA[<=]]> #{deliveryDtTo}
+	        </if>
+	</select>
+
+    
+    <select id ="selectOrderList" resultMap="OrderMap" >
+    	SELECT 
+			    	RN,
+					ORDER_NO,
+					COMP_CD,
+					COMP_NAME,
+					ITEM_CD,
+					ITEM_NAME,
+					UNIT_PRICE,
+					BOX_TYPE,
+					ORDER_QTY,
+					ORDER_PRICE,
+					ORDER_STATUS,
+					DELIVERY_DT,
+					REG_DT
+    	FROM
+    		(SELECT 
+			    	ROW_NUMBER() OVER(ORDER BY A.ORDER_NO DESC) RN,
+				    A.ORDER_NO,
+				    A.COMP_CD,
+				    (SELECT C.COMP_NAME FROM TB_PARTNER_INFO C WHERE C.COMP_CD = A.COMP_CD) COMP_NAME,
+				    B.ITEM_CD,
+				    B.ITEM_NAME,
+				    B.UNIT_PRICE,
+				    B.BOX_TYPE,
+				    B.ORDER_QTY,
+				    B.ORDER_PRICE,
+				    A.ORDER_STATUS,
+				    TO_CHAR(A.DELIVERY_DT, 'YYYY-MM-DD')  DELIVERY_DT,
+            		TO_CHAR(A.REG_DT, 'YYYY-MM-DD')  REG_DT
+				FROM
+				    TB_ORDER_INFO A, 
+				    (
+				    SELECT  C.ORDER_NO,D.ITEM_NAME ,D.UNIT_PRICE, C.ORDER_QTY, C.ORDER_PRICE, C.ITEM_CD,D.BOX_TYPE  
+				        FROM TB_ITEM_INFO D, TB_ORDER_ITEM C 
+				        WHERE D.ITEM_CD = C.ITEM_CD) B
+				WHERE
+				    A.ORDER_NO = B.ORDER_NO
+				<if test="compCd != null and compCd != ''">
+	            AND COMP_CD LIKE '%' || #{compCd} || '%'
+	        	</if>
+				<if test="itemCd!=null and itemCd!=''">
+				AND ITEM_CD LIKE '%'||#{itemCd}||'%'
+				</if>
+				<if test="deliveryDtFrom != null and deliveryDtFrom != ''">
+	            AND TO_CHAR(A.DELIVERY_DT, 'yyyy-mm-dd') <![CDATA[>=]]> #{deliveryDtFrom}
+		        </if>
+		        <if test="deliveryDtTo != null and deliveryDtTo != ''">
+		          AND TO_CHAR(A.DELIVERY_DT, 'yyyy-mm-dd') <![CDATA[<=]]> #{deliveryDtTo}
+		        </if>
+					)
+					WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+					AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}	    
+    </select>
+    
+    <select id = "selectModalDtlData" resultMap="OrderMap">
+    	SELECT
+    		A.ITEM_CD,
+		    A.ITEM_NAME,
+		    A.BOX_TYPE,
+		    A.BOX_QTY,
+		    A.UNIT_PRICE,
+            B.ORDER_QTY,
+            B.ORDER_PRICE
+		FROM 
+		    TB_ITEM_INFO A , TB_ORDER_ITEM B 
+		WHERE
+		    A.ITEM_CD = B.ITEM_CD
+		AND
+		    B.ORDER_NO = #{orderNo}
+		AND
+		    B.COMP_CD = #{compCd}
+    </select>
+		
+	<update id = "updateStatus">
+		UPDATE TB_ORDER_INFO
+		SET ORDER_STATUS = '02'
+		WHERE ORDER_NO = #{orderNo}
+	</update>
+	
+	<delete id = "deleteOrderItemData">
+		DELETE FROM TB_ORDER_ITEM
+		WHERE ORDER_NO = #{orderNo}
+		AND COMP_CD = #{compCd}
+	</delete>
+	<insert id = "insertOrderItemData">
+		INSERT INTO TB_ORDER_ITEM(ORDER_NO, COMP_CD, ITEM_CD, ORDER_QTY, ORDER_PRICE, REG_DT ,REG_USER_ID )
+		VALUES(#{orderNo},#{compCd},#{itemCd},#{orderQty},#{orderPrice},SYSDATE,#{userId})
+	</insert>
+	
+	
+	
+	
+	 <select id ="selectMaxOrderNo" resultType="String">
+	        SELECT
+				CASE
+				WHEN
+		            TO_CHAR(SYSDATE, 'YYYYMM') = MAX(SUBSTR(ORDER_NO, 1,6))
+				THEN
+		            REPLACE((TO_CHAR(SYSDATE, 'YYYYMM')||
+		                                    TO_CHAR((SUBSTR(MAX(ORDER_NO),7,2)+1),'00')),' ','')
+				ELSE
+		            REPLACE((TO_CHAR(SYSDATE, 'YYYYMM')|| '01'),' ','')
+				END  ORDER_NO
+				FROM
+					TB_ORDER_INFO     
+	    </select>
+	
+	
+	
+<insert id="insertOrderItem">
+    INSERT INTO TB_ORDER_ITEM (ORDER_NO, COMP_CD, ITEM_CD, ORDER_QTY, ORDER_PRICE, REG_DT,  REG_USER_ID)
+    VALUES (#{orderNo}, #{compCd}, #{itemCd}, #{orderQty}, #{orderPrice}, SYSDATE, #{userId})
+</insert>
+
+<insert id="insertOrderInfo">
+    INSERT INTO TB_ORDER_INFO (ORDER_NO, COMP_CD, ORDER_STATUS, REG_DT, DELIVERY_DT, REG_USER_ID)
+    VALUES (#{orderNo}, #{compCd}, '01', SYSDATE, #{deliveryDt}, #{userId})
+</insert>
+
+	
+	
+	<select id = "selectDailyOrderList" resultMap="OrderMap">
+		SELECT 
+		    TO_CHAR(C.DELIVERY_DT, 'MM-DD') DELIVERY_DT,
+		    C.COMP_CD, 
+		    B.COMP_NAME ,
+		    A.ITEM_NAME, 
+		    C.ITEM_CD,
+		    C.ORDER_QTY  
+		FROM 
+		    TB_ITEM_INFO A, 
+		    TB_PARTNER_INFO B,
+		    
+		    (SELECT B.DELIVERY_DT,A.COMP_CD, A.ITEM_CD,A.ORDER_QTY
+			    FROM TB_ORDER_ITEM A,TB_ORDER_INFO B
+			    WHERE A.ORDER_NO = B.ORDER_NO
+			    AND B.DELIVERY_DT BETWEEN #{deliveryDtFrom} AND #{deliveryDtTo}) C
+		WHERE
+		    B.COMP_CD = C.COMP_CD
+		AND
+		    A.ITEM_CD = C.ITEM_CD
+		ORDER BY
+			C.COMP_CD    
+	</select>
+
+</mapper>

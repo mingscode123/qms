@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.code.dao.CodeDao">
+	<resultMap type="com.qms.table.vo.common.ComCodeVO" id="ComCodeMap">
+		<result property="comGrpCd" column="COM_GRP_CD" />
+		<result property="comCd" column="COM_CD" />
+		<result property="comName" column="COM_NAME" />
+		<result property="memo" column="MEMO" />
+		<result property="delYn" column="DEL_YN" />
+	</resultMap >
+	
+	<select id="selectGetdata" resultMap= "ComCodeMap">
+		SELECT 
+			COM_NAME,
+			COM_GRP_CD,
+			COM_CD 
+		FROM 
+			TB_COM_CODE 
+		WHERE 
+			COM_GRP_CD = #{comGrpCd}
+	</select>
+	
+	
+	
+</mapper>

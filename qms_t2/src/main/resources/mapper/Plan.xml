@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.plan.dao.PlanDao">
+
+		<resultMap type="com.qms.plan.vo.planVO" id="PlanMap">
+			<result property="itemCd" column="item_cd" />
+			<result property="itemName" column="item_name" />
+			<result property="compCd" column="comp_cd" />
+			<result property="compName" column="comp_name" />
+			<result property="planDt" column="plan_dt" />
+			<result property="planQty" column="plan_qty" />
+			<result property="orderQty" column="order_qty" />
+			<result property="regDt" column="reg_dt" />
+			<result property="regUserId" column="reg_user_id" />
+			<result property="updDt" column="upd_dt" />
+			<result property="updUserId" column="upd_user_id" />
+			<result property="planYear" column="plan_year" />
+			<result property="planMonth" column="plan_month" />
+			
+			<result property="boxQty" column="BOX_QTY" />
+			<result property="insQty" column="INS_QTY" />
+			<result property="demandQty" column="DEMAND_QTY" />
+			<result property="sitemCd" column="SITEM_CD" />
+			<result property="palnDtFrom" column="PLAN_DT_FROM" />
+			<result property="palnDtTo" column="PLAN_DT_TO" />
+			<result property="totalPlanQty" column="TOTAL_PLAN_QTY" />
+		</resultMap>
+
+	
+	
+	<delete id = "deletePlan">
+	DELETE FROM TB_PLAN_INFO
+        WHERE TO_CHAR(PLAN_DT,'YYYYMM') = #{planYear}||#{planMonth}
+         AND COMP_CD = #{compCd}
+	</delete>
+	
+	<update  id="insertPlan">
+    <foreach collection="planlist" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">
+	INTO TB_PLAN_INFO (
+		 COMP_CD,
+		 PLAN_DT,
+		 ITEM_CD,
+		 PLAN_QTY,
+		 ORDER_QTY,
+		 REG_USER_ID,
+		 REG_DT
+	  )
+		VALUES (
+	 #{compCd},#{item.planDt}, #{item.itemCd}, #{item.planQty}
+	 ,  #{item.orderQty}, #{userId}, SYSDATE
+	 )
+    		</foreach>
+		</update>
+	
+ 	
+ 	<select id="selectTotalMkPlanCount" resultType="integer">
+
+		SELECT COUNT(*)
+		FROM(
+			SELECT 
+				B.COMP_CD, A.ITEM_CD, SUM(A.PLAN_QTY)
+			FROM
+			    TB_PLAN_INFO A,
+			    TB_PARTNER_INFO B
+			WHERE 
+			    A.COMP_CD = B.COMP_CD
+		    AND
+		    	TO_CHAR(A.PLAN_DT, 'YYYY') = #{mkPlanYear}
+		    AND
+		    	TO_CHAR(A.PLAN_DT, 'MM') = #{mkPlanMonth}
+		    GROUP BY B.COMP_CD, A.ITEM_CD
+		)
+	    
+		
+		
+  		
+	</select>
+ 	
+ 	<select id = "selectMkPlanList" resultMap ="PlanMap">
+ 			SELECT
+ 				COMP_CD,
+			    COMP_NAME,
+			    ITEM_CD,
+			    ITEM_NAME,
+			    PLAN_DT,
+			    PLAN_QTY
+			 FROM
+ 			(
+	 			SELECT 
+	 				A.COMP_CD,
+				    B.COMP_NAME,
+				    A.ITEM_CD,
+				    C.ITEM_NAME,
+				    TO_CHAR(A.PLAN_DT,'DD')PLAN_DT,
+				    A.PLAN_QTY
+				FROM
+				    TB_PLAN_INFO A,
+				    TB_PARTNER_INFO B,
+				    TB_ITEM_INFO C
+				WHERE
+				    A.COMP_CD = B.COMP_CD
+				AND
+				    A.ITEM_CD = C.ITEM_CD
+				AND
+					TO_CHAR(A.PLAN_DT,'YYYY') = #{mkPlanYear}
+				AND
+					TO_CHAR(A.PLAN_DT,'MM') = #{mkPlanMonth}
+				<if test="compCd !='' and compCd != null">
+					AND A.COMP_CD = #{compCd}
+				</if>
+				ORDER BY A.PLAN_DT
+			)		
+			
+			    
+ 	</select>
+ 	<!-- 여기부터 시작 -->
+ 	<select id = "selectTotalPlanItemCount"  resultType = "Integer">
+ 		SELECT COUNT(*)
+		FROM(
+		 		SELECT 
+		 			A.ITEM_CD, B.ITEM_NAME, SUM(A.PLAN_QTY)
+				FROM 
+					TB_PLAN_INFO A, TB_ITEM_INFO B
+				WHERE 
+					A.ITEM_CD = B.ITEM_CD
+				AND 
+					A.PLAN_QTY <![CDATA[>]]> 0	
+				AND 
+					TO_CHAR(A.PLAN_DT, 'yyyy-mm-dd') <![CDATA[>]]> #{palnDtFrom}
+				AND 
+					TO_CHAR(A.PLAN_DT, 'yyyy-mm-dd') <![CDATA[<=]]> #{palnDtTo}
+				<if test="itemCd !=null and itemCd !=''">
+				AND A.ITEM_CD LIKE '%'||#{itemCd}||'%'
+				</if> 
+				<if test="compCd !=null and compCd !=''">
+				AND A.COMP_CD LIKE '%'||#{compCd}||'%'
+				</if> 
+				GROUP BY 
+					A.ITEM_CD, B.ITEM_NAME
+				)	
+   </select>
+ 	
+ 	<select id="selectPlanItemList" resultMap="PlanMap">
+			    SELECT
+		        ITEM_CD, 
+		        ITEM_NAME, 
+		        TOTAL_PLAN_QTY,
+		        RN
+		    FROM
+		    (
+		        SELECT 
+		            ROWNUM RN,
+		            ITEM_CD, 
+		            ITEM_NAME, 
+		            TOTAL_PLAN_QTY
+		        FROM
+		        (
+		            SELECT 
+		                A.ITEM_CD, 
+		                B.ITEM_NAME, 
+		                SUM(A.PLAN_QTY) TOTAL_PLAN_QTY
+		            FROM 
+		                TB_PLAN_INFO A, TB_ITEM_INFO B
+		            WHERE 
+		                A.ITEM_CD = B.ITEM_CD
+		            AND 
+		                A.PLAN_QTY <![CDATA[>]]> 0	
+		            AND 
+		                TO_CHAR(A.PLAN_DT, 'yyyy-mm-dd') <![CDATA[>]]> #{palnDtFrom}
+		            AND 
+		                TO_CHAR(A.PLAN_DT, 'yyyy-mm-dd') <![CDATA[<=]]> #{palnDtTo}
+		            <if test="itemCd !=null and itemCd !=''">
+						AND A.ITEM_CD LIKE '%'||#{itemCd}||'%'
+					</if> 
+					<if test="compCd !=null and compCd !=''">
+						AND A.COMP_CD LIKE '%'||#{compCd}||'%'
+					</if>     
+		            GROUP BY 
+		                A.ITEM_CD, B.ITEM_NAME
+		        )
+		    )
+		    WHERE RN <![CDATA[>]]> (#{currentPage}-1)*#{countPerPage} 
+		    AND RN <![CDATA[<=]]> #{currentPage}*#{countPerPage}
+	</select>
+	<select id = "selectTotalMaterialReqCount" resultType = "Integer">
+		SELECT COUNT(*)
+		FROM(
+			SELECT 
+		        A.ITEM_CD, 
+		        B.ITEM_NAME, 
+		        A.INS_QTY,
+		        B.BOX_QTY
+		    FROM
+		        TB_BOM_DTL A, TB_ITEM_INFO B
+		    WHERE
+		        A.ITEM_CD = B.ITEM_CD
+		    AND
+		        A.ITEM_CD IN (
+		            SELECT SITEM_CD
+		            FROM TB_BOM_DTL
+		            WHERE ITEM_CD IN
+		            <foreach item="item" collection="bomlist" open="(" separator="," close=")">
+		                #{item.itemCd}
+		            </foreach>
+	        )
+	     )	   
+	</select>
+	<select id="selectMaterialReqList" resultMap="PlanMap">
+	     SELECT
+		         RN, 
+	             SITEM_CD,
+	             DEMAND_QTY,
+	             ITEM_NAME,
+	             BOX_QTY
+		    FROM
+		    (
+		     SELECT 
+	             ROWNUM AS RN, 
+	             SITEM_CD,
+	             DEMAND_QTY,
+	             ITEM_NAME,
+	             BOX_QTY
+	        FROM (
+		        SELECT 
+			        A.SITEM_CD, 
+			        SUM(A.INS_QTY *  B. ORDER_QTY ) DEMAND_QTY
+		        FROM 
+		        	TB_BOM_DTL A, TB_PLAN_INFO B
+		        WHERE 
+		        	A.ITEM_CD = B.ITEM_CD
+		        AND 
+		        	A.ITEM_CD IN 
+		        		<foreach item="item" collection="bomlist" open="(" separator="," close=")">
+		                #{item.itemCd}
+		            	</foreach>
+		        GROUP BY 
+		        	A.SITEM_CD
+	        ) A, TB_ITEM_INFO B
+	        WHERE 
+	        	A.SITEM_CD = B.ITEM_CD
+	       ) 	
+         WHERE RN <![CDATA[>]]> (#{currentPage}-1)*#{countPerPage} 
+		 AND RN <![CDATA[<=]]> #{currentPage}*#{countPerPage}
+	</select>
+ 	<!-- 끝 -->
+ 	
+ 	<select id="selectPartnerInfo" resultMap="PlanMap">
+        SELECT A.ITEM_CD, B.ITEM_NAME
+        FROM TB_PARTNER_ITEM A, TB_ITEM_INFO B
+        WHERE A.ITEM_CD = B.ITEM_CD
+        AND A.COMP_CD = #{compCd}
+        ORDER BY A.ITEM_CD
+    </select>
+    
+    <select id="selectPlanList" resultMap="PlanMap">
+        SELECT A.ITEM_CD, C.ITEM_NAME, B.ORDER_QTY, B.PLAN_QTY, (TO_CHAR(B.PLAN_DT,'DD'))PLAN_DT
+        FROM TB_PARTNER_ITEM A, (SELECT * FROM TB_PRODUCT_INFO WHERE PLAN_DT LIKE '%'||#{planDt}||'%')B, TB_ITEM_INFO C
+        WHERE A.COMP_CD = #{compCd}
+        AND A.COMP_CD = B.COMP_CD(+)
+        AND A.ITEM_CD = B.ITEM_CD(+)
+        AND A.ITEM_CD = C.ITEM_CD
+        <if test="itemCd != null and itemCd != ''">
+            and A.ITEM_CD like '%'||#{itemCd}||'%'
+        </if>
+        ORDER BY B.PLAN_DT
+    </select>
+ 	
+
+</mapper>

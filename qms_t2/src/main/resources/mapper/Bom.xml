@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.item.dao.BomDao">
+
+		<resultMap type="com.qms.item.vo.BomVO" id="BomMap">
+		<result property="itemCd" column="item_cd" />
+		<result property="useYn" column="use_yn" />
+		<result property="regDt" column="reg_dt" />
+		<result property="regUserId" column="reg_user_id" />
+		<result property="updDt" column="upd_dt" />
+		<result property="updUserId" column="upd_user_id" />
+		<result property="itemName" column="item_name" />
+		<result property="unitType" column="unit_type" />
+		<result property="plantLine" column="plant_line" />
+		<result property="boxType" column="box_type" />
+		<result property="bomCnt" column="bom_cnt" />
+		<result property="bomLevel" column="bom_level" />
+		<result property="sitemCd" column="sitem_cd" />
+		<result property="insQty" column="ins_qty" />
+		<result property="itemType" column="item_type" />
+		<result property="sitemName" column="sitem_name" />
+		</resultMap>
+		<select id="selectTotalBomCount" resultType="integer">
+		SELECT COUNT(*)
+		FROM 
+		    TB_BOM_INFO A, TB_ITEM_INFO B
+		   
+		WHERE A.ITEM_CD = B.ITEM_CD
+		<if test="itemCd != null and itemCd !=''">
+		    AND A.ITEM_CD like '%' || #{itemCd} || '%'
+		</if>
+		<if test="itemName != null and itemName !=''">
+		    AND B.ITEM_NAME = #{itemName}
+		</if>
+	</select>
+		<select id = "selectBomList" resultMap = "BomMap">
+		SELECT
+		ITEM_CD,ITEM_NAME,UNIT_TYPE,PLANT_LINE,BOX_TYPE,BOM_CNT,REG_DT,ITEM_TYPE
+		FROM (
+		SELECT
+		ROWNUM RN,
+		A.ITEM_CD,
+		B.ITEM_NAME,
+		( SELECT COM_NAME FROM TB_COM_CODE WHERE COM_GRP_CD = 'IT02' AND B.UNIT_TYPE=COM_CD)AS UNIT_TYPE,
+		( SELECT COM_NAME FROM TB_COM_CODE WHERE COM_GRP_CD = 'IT04' AND B.PLANT_LINE=COM_CD)AS PLANT_LINE,
+		( SELECT COM_NAME FROM TB_COM_CODE WHERE COM_GRP_CD = 'IT03' AND B.BOX_TYPE=COM_CD)AS BOX_TYPE,
+		(SELECT COUNT(*)FROM TB_BOM_DTL C WHERE C.ITEM_CD = A.ITEM_CD)AS BOM_CNT,
+		B.REG_DT,
+		B.ITEM_TYPE
+		FROM TB_BOM_INFO A, TB_ITEM_INFO B
+		WHERE B.ITEM_CD = A.ITEM_CD
+		<if test="itemCd != null and itemCd !=''">
+		    AND A.ITEM_CD like '%' || #{itemCd} || '%'
+		</if>
+		<if test="itemName != null and itemName !=''">
+		    AND B.ITEM_NAME = #{itemName}
+		</if>
+		<if test="itemType!= null and itemType!=''">
+		    AND B.ITEM_TYPE = #{itemType}
+		</if>)
+		WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+		AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+		</select>
+
+<select id = "selectBomDtlList" resultMap = "BomMap">
+ SELECT A.ITEM_CD,B.ITEM_NAME,
+ 		(SELECT ITEM_NAME FROM TB_ITEM_INFO WHERE ITEM_CD = A.SITEM_CD) SITEM_NAME,
+ 		 A.SITEM_CD, A.BOM_LEVEL, A.INS_QTY,
+        (SELECT COM_NAME FROM TB_COM_CODE WHERE COM_GRP_CD = 'IT02' AND B.UNIT_TYPE = COM_CD)AS UNIT_TYPE,
+        (SELECT COM_NAME FROM TB_COM_CODE WHERE COM_GRP_CD = 'IT01' AND B.ITEM_TYPE = COM_CD) ITEM_TYPE
+        FROM TB_BOM_DTL A, TB_ITEM_INFO B
+        WHERE A.ITEM_CD = #{itemCd}
+        AND A.ITEM_CD = B.ITEM_CD
+</select>
+
+<delete id ="deliteItem">
+DELETE FROM TB_BOM_DTL
+WHERE ITEM_CD = #{itemCd}
+</delete>
+	<update  id="itemNewInsertAdd">
+    <foreach collection="itemlist" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">
+	INTO TB_BOM_DTL (
+		 ITEM_CD,
+		 SITEM_CD,
+		 BOM_LEVEL,
+		 INS_QTY,
+		 REG_DT,
+		 REG_USER_ID
+	  )
+		VALUES (
+	 #{itemCd}, #{item.sitemCd}, #{item.bomLevel}, #{item.insQty}
+	 , SYSDATE, #{userId}
+	 )
+    		</foreach>
+		</update>
+<select id = "selectBomDtl" resultMap = "BomMap">
+		SELECT ITEM_CD, ITEM_NAME
+        FROM TB_ITEM_INFO 
+        WHERE ITEM_CD = #{itemCd}
+</select>
+<insert id="insertNewBom">
+        INSERT INTO TB_BOM_INFO(ITEM_CD, REG_DT, REG_USER_ID, USE_YN)
+        VALUES (#{itemCd}, SYSDATE, #{regUserId}, 'Y')
+   </insert>
+
+		</mapper>

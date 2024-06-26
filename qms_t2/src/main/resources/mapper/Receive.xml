@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.receive.dao.ReceiveDao">
+
+<resultMap type="com.qms.receive.vo.ReceiveVO" id="ReceiveMap">
+		<result property="rcvNo"    column="RCV_NO" />
+		<result property="invoiceNo"    column="INVOICE_NO" />
+		<result property="inQty"    column="IN_QTY" />
+		<result property="inPrice"    column="IN_PRICE" />
+		<result property="location"    column="LOCATION" />
+		<result property="inDt"    column="IN_DT" />
+		<result property="inStatus"    column="IN_STATUS" />
+		<result property="regDt"    column="REG_DT" />
+		<result property="regDtFrom"    column="REG_DT_FROM" />
+		<result property="regDtTo"    column="REG_DT_TO" />
+		
+		<result property="compCd"    column="COMP_CD" />
+		<result property="itemCd"    column="ITEM_CD" />
+		<result property="itemName"    column="ITEM_NAME" />
+		<result property="compName"    column="COMP_NAME" />
+		
+		
+		<result property="comName"    column="COM_NAME" />
+		<result property="comGrpCd"    column="COM_GRP_CD" />
+		<result property="comCd"    column="COM_CD" />
+</resultMap>
+
+<resultMap type="com.qms.receive.vo.RcvVO" id="rcvMap">
+		<result property="rcvNo" column="RCV_NO" />
+		<result property="itemCd" column="ITEM_CD" />
+		<result property="inQty" column="IN_QTY" />
+		<result property="inPrice" column="IN_PRICE" />
+		<result property="location" column="LOCATION" />
+		<result property="invoiceNo" column="INVOICE_NO" />
+		<result property="compCd" column="COMP_CD" />
+		<result property="inDt" column="IN_DT" />
+		<result property="inStatus" column="IN_STATUS" />
+		<result property="shipper" column="SHIPPER" />
+		<result property="consignee" column="CONSIGNEE" />
+		<result property="notiParty" column="NOTI_PARTY" />
+		<result property="portLoad" column="PORT_LOAD" />
+		<result property="finalDest" column="FINAL_DEST" />
+		<result property="carrier" column="CARRIER" />
+		<result property="remark" column="REMARK" />
+		<result property="regDt" column="REG_DT" />
+		<result property="regUserId" column="REG_USER_ID" />
+		<result property="uptDt" column="UPT_DT" />
+		<result property="uptUserId" column="UPT_USER_ID" />
+		<result property="totalPrice" column="TOTAL_PRICE" />
+		<result property="itemCnt" column="ITEM_CNT" />
+		<result property="compName" column="COMP_NAME" />
+		<result property="inDtFrom" column="IN_DT_FROM" />
+		<result property="inDtTo" column="IN_DT_TO" />
+		<result property="itemName" column="item_name" />
+		<result property="boxType" column="box_type" />
+		<result property="boxQty" column="box_qty" />
+		<result property="inQty" column="in_qty" />
+		<result property="inPrice" column="in_price" />
+		<result property="location" column="location" />
+	</resultMap>
+
+<select id="selectTotalReceiveCount" resultType="integer">
+
+		SELECT COUNT(*)
+		FROM 
+		    TB_RCV_INFO A
+		INNER JOIN 
+		    TB_RCV_ITEM B ON A.RCV_NO = B.RCV_NO
+		INNER JOIN 
+		    TB_ITEM_INFO C ON B.ITEM_CD = C.ITEM_CD
+		WHERE
+		    1=1
+		<if test="invoiceNo != null and invoiceNo !=''">
+		    AND A.INVOICE_NO '%' || #{invoiceNo} || '%'
+		</if>
+		<if test="compCd != null and compCd !=''"> 
+		    AND A.COMP_CD = #{compCd}
+		</if>
+		<if test="regDtFrom!=null and regDtFrom!=''">
+			AND TO_CHAR(A.REG_DT,'yyyy-mm-dd') <![CDATA[ >= ]]> #{regDtFrom}
+		</if>
+			<if test="regDtTo!=null and regDtTo!=''">
+		AND TO_CHAR(A.REG_DT,'yyyy-mm-dd') <![CDATA[ <= ]]> #{regDtTo}
+			</if>
+  		
+	</select>
+
+	<select id="selectReceiveList" resultMap="ReceiveMap">
+			SELECT
+				ITEM_CD,
+				ITEM_NAME,
+				INVOICE_NO,
+				IN_QTY,
+				IN_PRICE,
+				COM_NAME,
+				IN_DT,
+				IN_STATUS,
+				REG_DT
+			FROM(
+					 SELECT
+					 	ROWNUM RN,
+						A.ITEM_CD,
+						B.ITEM_NAME,
+						C.INVOICE_NO,
+						A.IN_QTY,
+						A.IN_PRICE,
+						D.COM_NAME,
+						TO_CHAR(C.IN_DT,'YYYY-MM-DD')IN_DT,
+						C.IN_STATUS,
+						TO_CHAR(A.REG_DT,'YYYY-MM-DD')REG_DT
+					FROM 
+						TB_RCV_ITEM A,
+						TB_ITEM_INFO B,
+						TB_RCV_INFO C,
+                        TB_COM_CODE D
+					WHERE
+						A.RCV_NO = C.RCV_NO
+					AND
+						A.ITEM_CD = B.ITEM_CD
+                    AND
+                        A.LOCATION = D.COM_CD
+                    AND 
+                    	D.COM_GRP_CD = #{comGrpCd}
+					<if test="invoiceNo != null and invoiceNo !=''">
+						AND C.INVOICE_NO LIKE '%' || #{invoiceNo} || '%'
+					</if>
+					<if test="compCd != null and compCd !=''">
+				    AND C.COMP_CD = #{compCd}
+					</if>
+					<if test="regDtFrom!=null and regDtFrom!=''">
+			  		AND TO_CHAR(A.REG_DT,'yyyy-mm-dd') <![CDATA[ >= ]]> #{regDtFrom}
+			  		</if>
+			  		<if test="regDtTo!=null and regDtTo!=''">
+			  		AND TO_CHAR(A.REG_DT,'yyyy-mm-dd') <![CDATA[ <= ]]> #{regDtTo}
+			 		</if>
+					)
+					WHERE 
+						RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage} 
+					AND 
+						RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+	</select>
+	
+	<select id="selectTotalRcvCount" resultType="integer">
+		 SELECT COUNT(*)
+				FROM    
+				   (SELECT A.IN_DT,
+				                    C.COMP_NAME,
+				                    A.INVOICE_NO,
+				                    TOTAL_PRICE,
+				                    ITEM_CNT
+				    FROM TB_RCV_INFO A, 
+				    ( SELECT RCV_NO, COUNT(*) ITEM_CNT , SUM(IN_QTY * IN_PRICE) TOTAL_PRICE
+					    FROM TB_RCV_ITEM 
+					    	GROUP BY RCV_NO) B, TB_PARTNER_INFO C
+						    WHERE A.RCV_NO = B.RCV_NO
+						    AND  A.COMP_CD = C.COMP_CD
+					    <if test="invoiceNo != null and invoiceNo !=''">
+			        		AND A.INVOICE_NO LIKE '%' || #{invoiceNo} || '%'
+			   		   </if>
+			   		   <if test="compName != null and compName !=''">
+			        		AND C.COMP_NAME LIKE '%' || #{compName} || '%'
+			   		   </if>
+			   		   <if test="inDtFrom !=null and inDtFrom !=''">
+							AND TO_CHAR(IN_DT,'yyyy-mm-dd') <![CDATA[ >= ]]>
+							#{inDtFrom}
+						</if>
+						<if test="inDtTo !=null and inDtTo !=''">
+							AND TO_CHAR(IN_DT,'yyyy-mm-dd') <![CDATA[ >= ]]>
+							#{inDtTo}
+						</if>)
+	</select>
+	
+	
+	<select id="selectRcvList" resultMap="rcvMap">
+				SELECT 
+						IN_DT,
+				        COMP_NAME,
+				        COMP_CD,
+				        RCV_NO,
+				        INVOICE_NO,
+				        TOTAL_PRICE,
+				        ITEM_CNT,
+				        REG_DT,
+				        RN
+				FROM (
+				    SELECT 
+				        TO_CHAR(A.IN_DT, 'YYYY-MM-DD') AS IN_DT,
+				        C.COMP_NAME,
+				        A.COMP_CD,
+				        A.INVOICE_NO,
+				        A.RCV_NO,
+				        B.TOTAL_PRICE,
+				        B.ITEM_CNT,
+				        TO_CHAR(A.REG_DT, 'YYYY-MM-DD') AS REG_DT,
+				        ROW_NUMBER() OVER(ORDER BY A.REG_DT DESC) RN
+				    FROM 
+				        TB_RCV_INFO A,
+				        (SELECT RCV_NO, COUNT(*) ITEM_CNT, SUM(IN_QTY * IN_PRICE) TOTAL_PRICE
+				         FROM TB_RCV_ITEM
+				         GROUP BY RCV_NO) B,
+				        TB_PARTNER_INFO C
+				    WHERE 
+				        A.RCV_NO = B.RCV_NO
+				        AND A.COMP_CD = C.COMP_CD
+				   <if test="invoiceNo != null and invoiceNo !=''">
+		        		AND A.INVOICE_NO LIKE '%' || #{invoiceNo} || '%'
+		   		   </if>
+		   		   <if test="compName != null and compName !=''">
+		        		AND C.COMP_NAME LIKE '%' || #{compName} || '%'
+		   		   </if>
+		   		   <if test="inDtFrom !=null and inDtFrom !=''">
+						AND TO_CHAR(IN_DT,'yyyy-mm-dd') <![CDATA[ >= ]]>
+						#{inDtFrom}
+					</if>
+					<if test="inDtTo !=null and inDtTo !=''">
+						AND TO_CHAR(IN_DT,'yyyy-mm-dd') <![CDATA[ >= ]]>
+						#{inDtTo}
+					</if>
+					
+				) 
+				WHERE RN<![CDATA[ > ]]>(#{currentPage}-1)*#{countPerPage}
+				AND RN<![CDATA[ <= ]]>#{currentPage}*#{countPerPage}
+
+	</select>
+		<select id = "selectRcvClickList" resultMap ="rcvMap">
+		SELECT
+		A.INVOICE_NO,
+		A.RCV_NO,
+		C.ITEM_CD,
+		B.ITEM_NAME,
+		B.BOX_TYPE,
+		B.BOX_QTY,
+		C.IN_QTY,
+		C.IN_PRICE,
+		C.LOCATION
+		FROM TB_RCV_INFO A ,TB_ITEM_INFO B , TB_RCV_ITEM C
+		WHERE A.INVOICE_NO = #{invoiceNo}
+		AND C.RCV_NO = A.RCV_NO
+		AND B.ITEM_CD = C.ITEM_CD
+		</select>
+		<delete id = "delitercv">
+		DELETE FROM TB_RCV_ITEM
+		WHERE RCV_NO = #{rcvNo}
+		 </delete>
+		 <update  id="RCVNewInsertAdd">
+    <foreach collection="rcvlist" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">
+	INTO TB_RCV_ITEM (
+		 RCV_NO,
+		 ITEM_CD,
+		 IN_QTY,
+		 IN_PRICE,
+		 LOCATION,
+		 REG_DT,
+		 REG_USER_ID
+	  )
+		VALUES (
+	 #{rcvNo}, #{item.itemCd}, #{item.inQty}, #{item.inPrice}
+	 , #{item.location},SYSDATE,#{userId}
+	 )
+    		</foreach>
+		</update>
+
+</mapper>

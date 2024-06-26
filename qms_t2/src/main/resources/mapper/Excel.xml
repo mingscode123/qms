@@ -1,0 +1,792 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.excel.dao.ExcelDao">
+	
+	<resultMap type="HashMap" id="itemMap">
+	
+		<result property="itemCd" 					column="ITEM_CD"/>
+		<result property="itemName" 				column="ITEM_NAME"/>
+		<result property="itemType"					column="ITEM_TYPE"/>
+		<result property="unitType" 				column="UNIT_TYPE"/>
+		<result property="hscode" 					column="HSCODE"/>
+		<result property="boxType" 					column="BOX_TYPE" />
+		<result property="boxQty" 					column="BOX_QTY" />
+		<result property="weight" 					column="WEIGHT" />
+		<result property="plantLine" 				column="PLANT_LINE" />		
+		<result property="unitPrice" 				column="UNIT_PRICE" />	
+		<result property="location" 				column="LOCATION" />	
+		<result property="subconYn" 				column="SUBCON_YN" />	
+		<result property="regDt"      				column="REG_DT" />
+	    <result property="regUserId"  				column="REG_USER_ID" />
+	    <result property="updDt"       				column="UPD_DT" />
+	    <result property="updUserId"   				column="UP_USER_ID" />
+	  	<result property="comName" 					column="COM_NAME" />	
+		<result property="comGrpCd" 				column="COM_GRP_CD" />	
+	    
+	</resultMap>
+	
+	<resultMap type="HashMap" id="userMap">
+		<result property="userId" 				column="USER_ID"/>
+		<result property="userPwd" 				column="USER_PWD"/>
+		<result property="userName"				column="USER_NAME"/>
+		<result property="phone" 				column="PHONE"/>
+		<result property="email" 				column="EMAIL"/>
+		<result property="deptCd" 				column="DEPT_CD" />
+		<result property="positionCd" 			column="POSITION_CD" />
+		<result property="leaveYn" 				column="LEAVE_YN" />
+		<result property="leaveDt" 				column="LEAVE_DT" />		
+		<result property="deptName" 			column="DEPT_NAME" />	
+		<result property="comName" 				column="COM_NAME" />	
+		<result property="comGrpCd" 			column="COM_GRP_CD" />	
+		<result property="regDt"      			column="REG_DT" />
+	    <result property="regUserId"  			column="REG_USER_ID" />
+	    <result property="updDt"       			column="UPD_DT" />
+	    <result property="updUserId"   			column="UP_USER_ID" />
+	  	
+	</resultMap>
+	
+		<resultMap type="HashMap" id="partnerMap">
+	
+		<result property="compCd" 					column="COMP_CD"/>
+		<result property="compName" 				column="COMP_NAME"/>
+		<result property="compType" 				column="COMP_TYPE"/>
+		<result property="bizNo"					column="BIZ_NO"/>
+		<result property="tradeYn" 					column="TRADE_YN"/>
+		<result property="compCeo" 					column="COMP_CEO"/>
+		<result property="phone" 					column="PHONE" />
+		<result property="email" 					column="EMAIL" />
+		<result property="addr" 					column="ADDR" />
+		<result property="mgrName" 					column="MGR_NAME" />		
+		<result property="mgrPosition" 				column="MGR_POSITION" />	
+		<result property="mgrPhone" 				column="MGR_PHONE" />	
+		<result property="delYn" 					column="DEL_YN" />	
+		<result property="regDt"      				column="REG_DT" />
+	    <result property="regUserId"  				column="REG_USER_ID" />
+	    <result property="updDt"       				column="UPD_DT" />
+	    <result property="updUserId"   				column="UP_USER_ID" />
+	    
+	</resultMap>
+
+	<resultMap type="HashMap" id="ReceiveMap">
+	
+		<result property="rcvNo"    column="RCV_NO" />
+		<result property="invoiceNo"    column="INVOICE_NO" />
+		<result property="inQty"    column="IN_QTY" />
+		<result property="inPrice"    column="IN_PRICE" />
+		<result property="location"    column="LOCATION" />
+		<result property="inDt"    column="IN_DT" />
+		<result property="inStatus"    column="IN_STATUS" />
+		<result property="regDt"    column="REG_DT" />
+		<result property="regDtFrom"    column="REG_DT_FROM" />
+		<result property="regDtTo"    column="REG_DT_TO" />
+		
+		<result property="compCd"    column="COMP_CD" />
+		<result property="itemCd"    column="ITEM_CD" />
+		<result property="itemName"    column="ITEM_NAME" />
+		<result property="compName"    column="COMP_NAME" />
+		
+		
+		<result property="comName"    column="COM_NAME" />
+		<result property="comGrpCd"    column="COM_GRP_CD" />
+		<result property="comCd"    column="COM_CD" />
+	</resultMap>
+<resultMap type="HashMap" id="PlanMap">
+			<result property="itemCd" column="item_cd" />
+			<result property="itemName" column="item_name" />
+			<result property="compName" column="comp_name" />
+			<result property="SUM" column="SUM" />
+			<result property="d1" column="d1" />
+			<result property="d2" column="d2" />
+			<result property="d3" column="d3" />
+			<result property="d4" column="d4" />
+			<result property="d5" column="d5" />
+			<result property="d6" column="d6" />
+			<result property="d7" column="d7" />
+			<result property="d8" column="d8" />
+			<result property="d9" column="d9" />
+			<result property="d10" column="d10" />
+			<result property="d11" column="d11" />
+			<result property="d12" column="d12" />
+			<result property="d13" column="d13" />
+			<result property="d14" column="d14" />
+			<result property="d15" column="d15" />
+			<result property="d16" column="d16" />
+			<result property="d17" column="d17" />
+			<result property="d18" column="d18" />
+			<result property="d19" column="d19" />
+			<result property="d20" column="d20" />
+			<result property="d21" column="d21" />
+			<result property="d22" column="d22" />
+			<result property="d23" column="d23" />
+			<result property="d24" column="d24" />
+			<result property="d25" column="d25" />
+			<result property="d26" column="d26" />
+			<result property="d27" column="d27" />
+			<result property="d28" column="d28" />
+			<result property="d29" column="d29" />
+			<result property="d30" column="d30" />
+			<result property="d31" column="d31" />
+			
+		</resultMap>
+		<resultMap type="HashMap" id="mthProMap">
+			<result property="compCd" column="COMP_CD" />
+			<result property="itemCd" column="ITEM_CD" />
+			<result property="itemName" column="ITEM_NAME" />
+			<result property="sitemCd" column="SITEM_CD" />
+			<result property="sitemName" column="SITEM_NAME" />
+			<result property="productQty" column="PRODUCT_QTY" />
+			<result property="insQty" column="INS_QTY" />
+			<result property="demandQty" column="DEMAND_QTY" />
+			<result property="planDt" column="PLAN_DT" />
+			<result property="totalQty" column="total_qty" />
+		</resultMap>
+		
+		<resultMap type="HashMap" id="OrderMap">
+        <result property="orderNo" column="ORDER_NO" />
+        <result property="compCd" column="COMP_CD" />
+        <result property="orderStatus" column="ORDER_STATUS" />
+        <result property="regDt" column="REG_DT" />
+        <result property="regUserId" column="REG_USER_ID" />
+        <result property="updDt" column="UPD_DT" />
+        <result property="updUserId" column="UPD_USER_ID" />
+        <result property="itemCd" column="ITEM_CD" />
+        <result property="orderQty" column="ORDER_QTY" />
+        <result property="orderPrice" column="ORDER_PRICE" />
+        <result property="deliveryDt" column="DELIVERY_DT" />
+        
+        <result property="deliveryDtFrom" column="DELIVERY_DT_FROM" />
+        <result property="deliveryDtTo" column="DELIVERY_DT_TO" />
+        
+        <result property="itemName" column="ITEM_NAME" />
+        <result property="boxType" column="BOX_TYPE" />
+        <result property="boxQty" column="BOX_QTY" />
+        <result property="compName" column="COMP_NAME" />
+        <result property="unitPrice" column="UNIT_PRICE" />
+    </resultMap>
+	
+	<resultMap type="HashMap" id="invenMap">
+		
+		<result property="itemCd" 					column="ITEM_CD"/>
+		<result property="itemName" 				column="ITEM_NAME"/>
+		<result property="itemType"					column="ITEM_TYPE"/>
+		<result property="unitType" 				column="UNIT_TYPE"/>
+		<result property="hscode" 					column="HSCODE"/>
+		<result property="boxType" 					column="BOX_TYPE" />
+		<result property="boxQty" 					column="BOX_QTY" />
+		<result property="weight" 					column="WEIGHT" />
+		<result property="plantLine" 				column="PLANT_LINE" />		
+		<result property="unitPrice" 				column="UNIT_PRICE" />	
+		<result property="location" 				column="LOCATION" />	
+		<result property="subconYn" 				column="SUBCON_YN" />	
+		<result property="regDt"      				column="REG_DT" />
+		<result property="userId"  					column="USER_ID" />
+	    <result property="regUserId"  				column="REG_USER_ID" />
+	    <result property="updDt"       				column="UPD_DT" />
+	    <result property="updUserId"   				column="UP_USER_ID" />
+	  	<result property="comName" 					column="COM_NAME" />	
+		<result property="comGrpCd" 				column="COM_GRP_CD" />
+		<result property="inQty" 					column="IN_QTY" />
+		<result property="inDt" 					column="IN_DT" />
+		
+		    	
+	</resultMap>
+	<resultMap type="HashMap" id="ProMap">
+			<result property="itemCd" column="item_cd" />
+			<result property="itemName" column="item_name" />
+			<result property="compCd" column="comp_cd" />
+			<result property="planDt" column="plan_dt" />
+			<result property="productQty" column="product_qty" />
+			<result property="regDt" column="reg_dt" />
+			<result property="regUserId" column="reg_user_id" />
+			<result property="updDt" column="upd_dt" />
+			<result property="updUserId" column="upd_user_id" />
+			<result property="productYear" column="product_year" />
+			<result property="productMonth" column="product_month" />
+			<result property="compName" column="comp_name" />
+			<result property="productDt" column="product_dt" />
+			<result property="orderQty" column="order_qty" />
+			<result property="planQty" column="plan_qty" />
+		</resultMap>
+		
+		<resultMap type="HashMap" id="deptMap">
+		<result property="deptCd" 				column="DEPT_CD"/>
+		<result property="deptName" 			column="DEPT_NAME"/>
+		<result property="upDeptCd"				column="UP_DEPT_CD"/>
+		<result property="upDeptName"			column="UP_DEPT_NAME"/>
+		<result property="delYn" 				column="DEL_YN"/>
+		<result property="positionCd" 			column="POSITION_CD" />
+		<result property="deptName" 			column="DEPT_NAME" />	
+		<result property="userCount"   			column="USER_COUNT" />
+		<result property="comGrpCd" 			column="COM_GRP_CD" />	
+		<result property="regDt"      			column="REG_DT" />
+	    <result property="regUserId"  			column="REG_USER_ID" />
+	    <result property="updDt"       			column="UPD_DT" />
+	    <result property="updUserId"   			column="UP_USER_ID" />
+	    
+	</resultMap>
+	 
+	<select id="selectDeptListTOexcel" resultMap="deptMap">
+			SELECT 
+			    A.DEPT_CD,
+			    A.DEPT_NAME,
+			    C.DEPT_NAME AS UP_DEPT_NAME, 
+			    CASE 
+			        WHEN NVL(U.USER_COUNT, 0) = 0 THEN '-'
+			        ELSE TO_CHAR(NVL(U.USER_COUNT, 0))
+			    END AS USER_COUNT,
+			    A.DEL_YN,
+			    TO_CHAR(A.REG_DT,'YYYY-MM-DD') REG_DT
+			FROM 
+			    TB_DEPT_INFO A
+			LEFT JOIN (
+			    SELECT 
+			        B.DEPT_CD,
+			        COUNT(B.DEPT_CD) AS USER_COUNT
+			    FROM 
+			        TB_USER_INFO B
+         		WHERE
+         			 LEAVE_YN = 'N'
+			    GROUP BY 
+			        B.DEPT_CD
+			) U ON A.DEPT_CD = U.DEPT_CD
+			LEFT JOIN 
+			    TB_DEPT_INFO C ON A.UP_DEPT_CD = C.DEPT_CD 
+			WHERE 
+			    1=1
+			    <if test="deptName != null and deptName != ''">
+			        AND A.DEPT_NAME LIKE '%' || #{deptName} || '%'
+			    </if>
+			    <if test="delYn != null and delYn !=''">
+			        AND A.DEL_YN = #{delYn}
+			    </if>
+	</select>
+
+	<select id="selectItemListTOexcel" resultMap="itemMap">
+		 SELECT 
+			    A.ITEM_CD, 
+			    A.ITEM_NAME,
+			    B1.COM_NAME AS ITEM_TYPE,
+                B2.COM_NAME AS UNIT_TYPE,
+                B3.COM_NAME AS PLANT_LINE,
+                B4.COM_NAME AS LOCATION,
+			    B5.COM_NAME AS BOX_TYPE,
+			    TO_CHAR(A.REG_DT, 'YYYY-MM-DD') AS REG_DT
+		    FROM
+		    	 TB_ITEM_INFO A
+    		INNER JOIN 
+				TB_COM_CODE B1 ON B1.COM_GRP_CD = 'IT01' AND A.ITEM_TYPE = B1.COM_CD
+			INNER JOIN 
+				TB_COM_CODE B2 ON B2.COM_GRP_CD = 'IT02' AND A.UNIT_TYPE = B2.COM_CD
+			INNER JOIN
+				TB_COM_CODE B3 ON B3.COM_GRP_CD = 'IT04' AND A.PLANT_LINE = B3.COM_CD
+			INNER JOIN 
+                TB_COM_CODE B4 ON B4.COM_GRP_CD = 'IT05' AND A.LOCATION = B4.COM_CD
+            INNER JOIN 
+                TB_COM_CODE B5 ON B5.COM_GRP_CD = 'IT03' AND A.BOX_TYPE = B5.COM_CD    
+			WHERE 1=1
+			<if test="itemCd != null and itemCd !=''">
+				AND A.ITEM_CD LIKE '%' || #{itemCd} || '%'
+			</if>
+			<if test="itemName != null and itemName !=''">
+				AND A.ITEM_NAME LIKE '%' || #{itemName} || '%'
+			</if>
+			<if test="itemType != null and itemType !=''">
+			    AND A.ITEM_TYPE = #{itemType}
+			</if>
+			AND B1.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		    AND B2.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		    AND B3.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		     AND B4.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		     AND B5.COM_GRP_CD IN 
+		    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+		        #{comGrpCd}
+		    </foreach>
+		     ORDER BY A.REG_DT DESC
+	</select>
+
+	<select id="selectPartnerListTOexcel" resultMap="partnerMap">
+		SELECT 
+			ROWNUM RN,
+			COMP_CD,
+			COMP_NAME,
+			DECODE(COMP_TYPE, 'S', '공급사', 'C', '고객사', COMP_TYPE) AS COMP_TYPE,
+			BIZ_NO,
+			TRADE_YN,
+			COMP_CEO,
+			PHONE,
+			EMAIL,
+			ADDR,
+			MGR_NAME,
+			MGR_POSITION,
+			MGR_PHONE,
+			DEL_YN,
+			TO_CHAR(REG_DT, 'YYYY-MM-DD') AS REG_DT
+			FROM TB_PARTNER_INFO
+		WHERE 1=1
+		<if test="compCd!=null and compCd!=''">
+		AND COMP_CD LIKE '%'||#{compCd}||'%'
+		</if>
+		<if test="compName!=null and compName!=''">
+		AND COMP_NAME LIKE '%'||#{compName}||'%'
+		</if>
+		<if test="compType!=null and compType!=''">
+		AND COMP_TYPE LIKE '%'||#{compType}||'%'
+		</if>
+		<if test="regDtFrom!=null and regDtFrom!=''">
+  		AND TO_CHAR(REG_DT,'yyyy-mm-dd') <![CDATA[ >= ]]> #{regDtFrom}
+  		</if>
+  		<if test="regDtTo!=null and regDtTo!=''">
+  		AND TO_CHAR(REG_DT,'yyyy-mm-dd') <![CDATA[ <= ]]> #{regDtTo}
+ 		</if>
+	</select>
+	
+	<select id="selectReceiveListTOexcel" resultMap="ReceiveMap">
+					SELECT
+					 	ROWNUM RN,
+						A.ITEM_CD,
+						B.ITEM_NAME,
+						C.INVOICE_NO,
+						A.IN_QTY,
+						A.IN_PRICE,
+						D.COM_NAME,
+						TO_CHAR(C.IN_DT,'YYYY-MM-DD')IN_DT,
+						C.IN_STATUS,
+						TO_CHAR(A.REG_DT,'YYYY-MM-DD')REG_DT
+					FROM 
+						TB_RCV_ITEM A,
+						TB_ITEM_INFO B,
+						TB_RCV_INFO C,
+                        TB_COM_CODE D
+					WHERE
+						A.RCV_NO = C.RCV_NO
+					AND
+						A.ITEM_CD = B.ITEM_CD
+                    AND
+                        A.LOCATION = D.COM_CD
+                    AND
+                    	D.COM_GRP_CD = 'IT05'
+					
+					<if test="invoiceNo != null and invoiceNo !=''">
+						AND C.INVOICE_NO LIKE '%' || #{invoiceNo} || '%'
+					</if>
+					<if test="compCd != null and compCd !=''">
+				    AND C.COMP_CD = #{compCd}
+					</if>
+					<if test="regDtFrom!=null and regDtFrom!=''">
+			  		AND TO_CHAR(A.REG_DT,'yyyy-mm-dd') <![CDATA[ >= ]]> #{regDtFrom}
+			  		</if>
+			  		<if test="regDtTo!=null and regDtTo!=''">
+			  		AND TO_CHAR(A.REG_DT,'yyyy-mm-dd') <![CDATA[ <= ]]> #{regDtTo}
+			 		</if>
+					
+				     	AND D.COM_GRP_CD IN 
+					    <foreach item="comGrpCd" collection="comGrpCdList" open="(" separator="," close=")">
+					        #{comGrpCd}
+					    </foreach>
+					
+	</select>
+	
+	<select id="selectUserListTOexcel" resultMap="userMap">
+		SELECT 
+					A.USER_ID,
+				    A.USER_NAME,
+				    B.DEPT_NAME,
+				    C.COM_NAME, 
+				    A.LEAVE_YN
+				FROM 
+				    TB_USER_INFO A
+				INNER JOIN 
+				    TB_DEPT_INFO B ON A.DEPT_CD = B.DEPT_CD
+				INNER JOIN 
+				    TB_COM_CODE C ON A.POSITION_CD = C.COM_CD
+				WHERE 1=1
+				<if test="userName!=null and userName!=''">
+				AND USER_NAME LIKE '%'||#{userName}||'%'
+				</if>
+				AND C.COM_GRP_CD = #{comGrpCd}
+				
+		</select>
+				
+	<select id="selectInvListTOexcel" resultMap="invenMap">
+			    SELECT 
+			        A.ITEM_CD, 
+			        A.ITEM_NAME,
+			        C.LOCATION,
+			        B.COM_NAME AS UNIT_TYPE,
+			        SUM(C.IN_QTY) AS IN_QTY,
+			        TO_CHAR(D.IN_DT, 'YYYYMM') AS IN_DT
+			    FROM
+			        TB_ITEM_INFO A
+			    INNER JOIN
+			        TB_RCV_ITEM C ON A.ITEM_CD = C.ITEM_CD 
+			    INNER JOIN 
+			        TB_COM_CODE B ON B.COM_GRP_CD = #{comGrpCd}
+			        AND A.UNIT_TYPE = B.COM_CD
+			    INNER JOIN
+			        TB_RCV_INFO D ON C.RCV_NO = D.RCV_NO
+			    WHERE 1=1
+			    <if test="itemCd != null and itemCd !=''">
+					AND A.ITEM_CD LIKE '%' || #{itemCd} || '%'
+				</if>
+			        AND TO_CHAR(D.IN_DT, 'YYYYMM') = #{inDt}
+			        AND A.LOCATION IS NOT NULL
+			    GROUP BY 
+			        A.ITEM_CD, 
+			        A.ITEM_NAME,
+			        C.LOCATION,
+			        B.COM_NAME,
+			        TO_CHAR(D.IN_DT, 'YYYYMM')
+	</select>
+	<select id ="selectQtyToExcel" resultMap = "PlanMap">
+SELECT ITEM_CD, ITEM_NAME, NVL(MAX(D1),'0/0') AS d1, NVL(MAX(D2),'0/0') AS d2, NVL(MAX(D3),'0/0') AS d3, NVL(MAX(D4),'0/0') AS d4, NVL(MAX(D5),'0/0') AS d5,
+               NVL(MAX(D6),'0/0') AS d6, NVL(MAX(D7),'0/0') AS d7, NVL(MAX(D8),'0/0') AS d8, NVL(MAX(D9),'0/0') AS d9, NVL(MAX(D10),'0/0') AS d10, 
+               NVL(MAX(D11),'0/0') AS d11, NVL(MAX(D12),'0/0') AS d12, NVL(MAX(D13),'0/0') AS d13, NVL(MAX(D14),'0/0') AS d14, NVL(MAX(D15),'0/0') AS d15, 
+               NVL(MAX(D16),'0/0') AS d16, NVL(MAX(D17),'0/0') AS d17, NVL(MAX(D18),'0/0') AS d18, NVL(MAX(D19),'0/0') AS d19, NVL(MAX(D20),'0/0') AS d20, 
+               NVL(MAX(D21),'0/0') AS d21, NVL(MAX(D22),'0/0') AS d22, NVL(MAX(D23),'0/0') AS d23, NVL(MAX(D24),'0/0') AS d24, NVL(MAX(D25),'0/0') AS d25, 
+               NVL(MAX(D26),'0/0') AS d26, NVL(MAX(D27),'0/0') AS d27, NVL(MAX(D28),'0/0') AS d28, NVL(MAX(D29),'0/0') AS d29, NVL(MAX(D30),'0/0') AS d30, NVL(MAX(D31),'0/0') AS d31
+FROM (               
+SELECT ITEM_CD, ITEM_NAME
+      ,DECODE( DT, '01', ORDER_QTY||'/'|| PLAN_QTY ) D1
+      ,DECODE( DT, '02', ORDER_QTY||'/'|| PLAN_QTY ) D2
+      ,DECODE( DT, '03', ORDER_QTY||'/'|| PLAN_QTY ) D3
+      ,DECODE( DT, '04', ORDER_QTY||'/'|| PLAN_QTY ) D4
+      ,DECODE( DT, '05', ORDER_QTY||'/'|| PLAN_QTY ) D5
+      ,DECODE( DT, '06', ORDER_QTY||'/'|| PLAN_QTY ) D6
+      ,DECODE( DT, '07', ORDER_QTY||'/'|| PLAN_QTY ) D7
+      ,DECODE( DT, '08', ORDER_QTY||'/'|| PLAN_QTY ) D8
+      ,DECODE( DT, '09', ORDER_QTY||'/'|| PLAN_QTY ) D9
+      ,DECODE( DT, '10', ORDER_QTY||'/'|| PLAN_QTY ) D10
+      ,DECODE( DT, '11', ORDER_QTY||'/'|| PLAN_QTY ) D11
+      ,DECODE( DT, '12', ORDER_QTY||'/'|| PLAN_QTY ) D12
+      ,DECODE( DT, '13', ORDER_QTY||'/'|| PLAN_QTY ) D13
+      ,DECODE( DT, '14', ORDER_QTY||'/'|| PLAN_QTY ) D14
+      ,DECODE( DT, '15', ORDER_QTY||'/'|| PLAN_QTY ) D15
+      ,DECODE( DT, '16', ORDER_QTY||'/'|| PLAN_QTY ) D16
+      ,DECODE( DT, '17', ORDER_QTY||'/'|| PLAN_QTY ) D17
+      ,DECODE( DT, '18', ORDER_QTY||'/'|| PLAN_QTY ) D18
+      ,DECODE( DT, '19', ORDER_QTY||'/'|| PLAN_QTY ) D19
+      ,DECODE( DT, '20', ORDER_QTY||'/'|| PLAN_QTY ) D20
+      ,DECODE( DT, '21', ORDER_QTY||'/'|| PLAN_QTY ) D21
+      ,DECODE( DT, '22', ORDER_QTY||'/'|| PLAN_QTY ) D22
+      ,DECODE( DT, '23', ORDER_QTY||'/'|| PLAN_QTY ) D23
+      ,DECODE( DT, '24', ORDER_QTY||'/'|| PLAN_QTY ) D24
+      ,DECODE( DT, '25', ORDER_QTY||'/'|| PLAN_QTY ) D25
+      ,DECODE( DT, '26', ORDER_QTY||'/'|| PLAN_QTY ) D26
+      ,DECODE( DT, '27', ORDER_QTY||'/'|| PLAN_QTY ) D27
+      ,DECODE( DT, '28', ORDER_QTY||'/'|| PLAN_QTY ) D28
+      ,DECODE( DT, '29', ORDER_QTY||'/'|| PLAN_QTY ) D29
+      ,DECODE( DT, '30', ORDER_QTY||'/'|| PLAN_QTY ) D30
+      ,DECODE( DT, '31', ORDER_QTY||'/'|| PLAN_QTY ) D31
+   FROM (
+    SELECT A.COMP_CD, A.ITEM_CD, C.ITEM_NAME, TO_CHAR(B.PLAN_DT,'DD') DT, B.ORDER_QTY, B.PLAN_QTY
+     FROM TB_PARTNER_ITEM A, ( SELECT * FROM TB_PLAN_INFO 
+                               WHERE TO_CHAR(PLAN_DT,'YYYYMM') = #{planDt} ) B,
+                               TB_ITEM_INFO C
+     WHERE A.COMP_CD = B.COMP_CD(+)
+       AND A.ITEM_CD = B.ITEM_CD(+)
+       AND A.COMP_CD = #{compCd}
+       AND A.ITEM_CD = C.ITEM_CD
+ )  
+
+ WHERE 1=1
+  ORDER BY DT
+)
+GROUP BY ITEM_CD, ITEM_NAME
+</select>
+
+<select id = "selectDailyOrderListTOexcel" resultMap = "OrderMap">
+	SELECT 
+		    TO_CHAR(C.DELIVERY_DT, 'MM-DD') DELIVERY_DT,
+		    C.COMP_CD, 
+		    B.COMP_NAME ,
+		    A.ITEM_NAME, 
+		    C.ITEM_CD,
+		    C.ORDER_QTY  
+		FROM 
+		    TB_ITEM_INFO A, 
+		    TB_PARTNER_INFO B,
+		    
+		    (SELECT B.DELIVERY_DT,A.COMP_CD, A.ITEM_CD,A.ORDER_QTY
+			    FROM TB_ORDER_ITEM A,TB_ORDER_INFO B
+			    WHERE A.ORDER_NO = B.ORDER_NO
+			    AND B.DELIVERY_DT BETWEEN #{deliveryDtFrom} AND #{deliveryDtTo}) C
+		WHERE
+		    B.COMP_CD = C.COMP_CD
+		AND
+		    A.ITEM_CD = C.ITEM_CD
+		ORDER BY
+			C.COMP_CD    
+</select>
+
+<select id = "selectMonthProListTOexcel" resultMap = "ProMap">
+	SELECT
+		        C.PLAN_DT,
+		        C.COMP_CD,
+		        E.COMP_NAME,
+		        C.ITEM_CD,
+		        D.ITEM_NAME,
+		        C.ORDER_QTY,
+		        C.PLAN_QTY,
+		        C.PRODUCT_QTY
+		    FROM
+		        (
+		        SELECT 
+		            A.PLAN_DT,
+		            A.COMP_CD,
+		            A.ITEM_CD,
+		            B.ORDER_QTY,
+		            B.PLAN_QTY,
+		            A.PRODUCT_QTY
+		        FROM
+		            TB_PRODUCT_INFO A,
+		            TB_PLAN_INFO B
+		        WHERE
+		            A.COMP_CD = B.COMP_CD
+		        AND
+		            A.PLAN_DT = B.PLAN_DT
+		        AND
+		            A.ITEM_CD = B.ITEM_CD
+		        AND
+    				TO_CHAR(A.PLAN_DT,'YYYYMM') = #{productDt}    
+		       	 <if test="compCd != null and compCd != ''">
+		        AND 
+		        	A.COMP_CD LIKE '%' || #{compCd} || '%'
+		        </if>
+		        ) C,
+		        TB_ITEM_INFO D,
+		        TB_PARTNER_INFO E
+		    WHERE
+		        C.ITEM_CD = D.ITEM_CD
+		    AND
+		        C.COMP_CD = E.COMP_CD 
+		</select>
+	
+<select id="selectPlanSearchListTOexcel" resultMap="PlanMap">
+			 WITH PLAN_DATA AS (
+    SELECT
+        COMP_NAME,
+        ITEM_CD,
+        ITEM_NAME,
+        DECODE(DT, '01', PLAN_QTY) AS D1,
+        DECODE(DT, '02', PLAN_QTY) AS D2,
+        DECODE(DT, '03', PLAN_QTY) AS D3,
+        DECODE(DT, '04', PLAN_QTY) AS D4,
+        DECODE(DT, '05', PLAN_QTY) AS D5,
+        DECODE(DT, '06', PLAN_QTY) AS D6,
+        DECODE(DT, '07', PLAN_QTY) AS D7,
+        DECODE(DT, '08', PLAN_QTY) AS D8,
+        DECODE(DT, '09', PLAN_QTY) AS D9,
+        DECODE(DT, '10', PLAN_QTY) AS D10,
+        DECODE(DT, '11', PLAN_QTY) AS D11,
+        DECODE(DT, '12', PLAN_QTY) AS D12,
+        DECODE(DT, '13', PLAN_QTY) AS D13,
+        DECODE(DT, '14', PLAN_QTY) AS D14,
+        DECODE(DT, '15', PLAN_QTY) AS D15,
+        DECODE(DT, '16', PLAN_QTY) AS D16,
+        DECODE(DT, '17', PLAN_QTY) AS D17,
+        DECODE(DT, '18', PLAN_QTY) AS D18,
+        DECODE(DT, '19', PLAN_QTY) AS D19,
+        DECODE(DT, '20', PLAN_QTY) AS D20,
+        DECODE(DT, '21', PLAN_QTY) AS D21,
+        DECODE(DT, '22', PLAN_QTY) AS D22,
+        DECODE(DT, '23', PLAN_QTY) AS D23,
+        DECODE(DT, '24', PLAN_QTY) AS D24,
+        DECODE(DT, '25', PLAN_QTY) AS D25,
+        DECODE(DT, '26', PLAN_QTY) AS D26,
+        DECODE(DT, '27', PLAN_QTY) AS D27,
+        DECODE(DT, '28', PLAN_QTY) AS D28,
+        DECODE(DT, '29', PLAN_QTY) AS D29,
+        DECODE(DT, '30', PLAN_QTY) AS D30,
+        DECODE(DT, '31', PLAN_QTY) AS D31
+    FROM (
+        SELECT 
+            A.COMP_CD,
+            B.COMP_NAME,
+            A.ITEM_CD,
+            C.ITEM_NAME,
+            TO_CHAR(A.PLAN_DT,'DD') AS DT,
+            A.PLAN_QTY
+        FROM
+            TB_PLAN_INFO A
+            JOIN TB_PARTNER_INFO B ON A.COMP_CD = B.COMP_CD
+            JOIN TB_ITEM_INFO C ON A.ITEM_CD = C.ITEM_CD
+        WHERE
+            TO_CHAR(A.PLAN_DT,'YYYY') = #{mkPlanYear}
+        AND
+	    	TO_CHAR(A.PLAN_DT,'MM') = #{mkPlanMonth}
+        ORDER BY A.COMP_CD, A.ITEM_CD, DT
+    )
+)
+SELECT *
+FROM (
+    SELECT
+        'TOTAL' AS COMP_NAME,
+        '' AS ITEM_CD,
+        '' AS ITEM_NAME,
+        SUM(NVL(D1, 0) + NVL(D2, 0) + NVL(D3, 0) + NVL(D4, 0) + NVL(D5, 0) + 
+            NVL(D6, 0) + NVL(D7, 0) + NVL(D8, 0) + NVL(D9, 0) + NVL(D10, 0) + 
+            NVL(D11, 0) + NVL(D12, 0) + NVL(D13, 0) + NVL(D14, 0) + NVL(D15, 0) + 
+            NVL(D16, 0) + NVL(D17, 0) + NVL(D18, 0) + NVL(D19, 0) + NVL(D20, 0) + 
+            NVL(D21, 0) + NVL(D22, 0) + NVL(D23, 0) + NVL(D24, 0) + NVL(D25, 0) + 
+            NVL(D26, 0) + NVL(D27, 0) + NVL(D28, 0) + NVL(D29, 0) + NVL(D30, 0) + 
+            NVL(D31, 0)) AS SUM,
+        SUM(NVL(D1, 0)) AS D1, SUM(NVL(D2, 0)) AS D2, SUM(NVL(D3, 0)) AS D3, SUM(NVL(D4, 0)) AS D4, SUM(NVL(D5, 0)) AS D5,
+        SUM(NVL(D6, 0)) AS D6, SUM(NVL(D7, 0)) AS D7, SUM(NVL(D8, 0)) AS D8, SUM(NVL(D9, 0)) AS D9, SUM(NVL(D10, 0)) AS D10, 
+        SUM(NVL(D11, 0)) AS D11, SUM(NVL(D12, 0)) AS D12, SUM(NVL(D13, 0)) AS D13, SUM(NVL(D14, 0)) AS D14, SUM(NVL(D15, 0)) AS D15, 
+        SUM(NVL(D16, 0)) AS D16, SUM(NVL(D17, 0)) AS D17, SUM(NVL(D18, 0)) AS D18, SUM(NVL(D19, 0)) AS D19, SUM(NVL(D20, 0)) AS D20, 
+        SUM(NVL(D21, 0)) AS D21, SUM(NVL(D22, 0)) AS D22, SUM(NVL(D23, 0)) AS D23, SUM(NVL(D24, 0)) AS D24, SUM(NVL(D25, 0)) AS D25, 
+        SUM(NVL(D26, 0)) AS D26, SUM(NVL(D27, 0)) AS D27, SUM(NVL(D28, 0)) AS D28, SUM(NVL(D29, 0)) AS D29, SUM(NVL(D30, 0)) AS D30, SUM(NVL(D31, 0)) AS D31
+    FROM PLAN_DATA
+    UNION ALL
+    SELECT
+        COMP_NAME,
+        ITEM_CD,
+        ITEM_NAME,
+        NVL(SUM(D1), 0) + NVL(SUM(D2), 0) + NVL(SUM(D3), 0) + NVL(SUM(D4), 0) + NVL(SUM(D5), 0) + 
+        NVL(SUM(D6), 0) + NVL(SUM(D7), 0) + NVL(SUM(D8), 0) + NVL(SUM(D9), 0) + NVL(SUM(D10), 0) + 
+        NVL(SUM(D11), 0) + NVL(SUM(D12), 0) + NVL(SUM(D13), 0) + NVL(SUM(D14), 0) + NVL(SUM(D15), 0) + 
+        NVL(SUM(D16), 0) + NVL(SUM(D17), 0) + NVL(SUM(D18), 0) + NVL(SUM(D19), 0) + NVL(SUM(D20), 0) + 
+        NVL(SUM(D21), 0) + NVL(SUM(D22), 0) + NVL(SUM(D23), 0) + NVL(SUM(D24), 0) + NVL(SUM(D25), 0) + 
+        NVL(SUM(D26), 0) + NVL(SUM(D27), 0) + NVL(SUM(D28), 0) + NVL(SUM(D29), 0) + NVL(SUM(D30), 0) + 
+        NVL(SUM(D31), 0) AS SUM,
+        NVL(MAX(D1),'0') AS D1, NVL(MAX(D2),'0') AS D2, NVL(MAX(D3),'0') AS D3, NVL(MAX(D4),'0') AS D4, NVL(MAX(D5), '0') AS D5,
+        NVL(MAX(D6),'0') AS D6, NVL(MAX(D7),'0') AS D7, NVL(MAX(D8),'0') AS D8, NVL(MAX(D9),'0') AS D9, NVL(MAX(D10),'0') AS D10, 
+        NVL(MAX(D11),'0') AS D11, NVL(MAX(D12),'0') AS D12, NVL(MAX(D13),'0') AS D13, NVL(MAX(D14),'0') AS D14, NVL(MAX(D15),'0') AS D15, 
+        NVL(MAX(D16),'0') AS D16, NVL(MAX(D17),'0') AS D17, NVL(MAX(D18),'0') AS D18, NVL(MAX(D19),'0') AS D19, NVL(MAX(D20),'0') AS D20, 
+        NVL(MAX(D21),'0') AS D21, NVL(MAX(D22),'0') AS D22, NVL(MAX(D23),'0') AS D23, NVL(MAX(D24),'0') AS D24, NVL(MAX(D25),'0') AS D25, 
+        NVL(MAX(D26),'0') AS D26, NVL(MAX(D27),'0') AS D27, NVL(MAX(D28),'0') AS D28, NVL(MAX(D29),'0') AS D29, NVL(MAX(D30),'0') AS D30, NVL(MAX(D31),'0') AS D31
+    FROM PLAN_DATA
+    GROUP BY COMP_NAME, ITEM_CD, ITEM_NAME
+)
+ORDER BY  COMP_NAME, ITEM_CD
+	</select>
+	<select id="selectMthProToExcel" resultMap="mthProMap">
+			 SELECT
+			        A.COMP_CD,
+			        A.ITEM_CD,
+			        C.ITEM_NAME,
+			        B.SITEM_CD,
+			        D.ITEM_NAME AS SITEM_NAME,
+			        A.PRODUCT_QTY,
+			        B.INS_QTY,
+			        A.PRODUCT_QTY*B.INS_QTY AS DEMAND_QTY,
+			        A.PLAN_DT
+			    FROM 
+			        TB_PRODUCT_INFO A,
+			        TB_BOM_DTL B,
+			        TB_ITEM_INFO C,
+			        TB_ITEM_INFO D
+			    WHERE
+			        A.ITEM_CD = B.ITEM_CD
+			    AND
+			        A.ITEM_CD = C.ITEM_CD
+			    AND 
+			        B.SITEM_CD = D.ITEM_CD
+			    AND
+			    	TO_CHAR(A.PLAN_DT,'YYYY') = #{mthProYear}
+			    AND
+			    	TO_CHAR(A.PLAN_DT,'MM') = #{mthProMonth}
+			    <if test="compCd != '' and compCd != null">
+			    	AND A.COMP_CD = #{compCd}
+				</if> 
+		
+	</select>
+	
+	<select id = "selectProductListTOexcel" resultMap="PlanMap">
+	WITH PLAN_DATA AS (
+    SELECT
+        COMP_NAME,
+        ITEM_CD,
+        ITEM_NAME,
+        DECODE(DT, '01', PRODUCT_QTY) AS D1,
+        DECODE(DT, '02', PRODUCT_QTY) AS D2,
+        DECODE(DT, '03', PRODUCT_QTY) AS D3,
+        DECODE(DT, '04', PRODUCT_QTY) AS D4,
+        DECODE(DT, '05', PRODUCT_QTY) AS D5,
+        DECODE(DT, '06', PRODUCT_QTY) AS D6,
+        DECODE(DT, '07', PRODUCT_QTY) AS D7,
+        DECODE(DT, '08', PRODUCT_QTY) AS D8,
+        DECODE(DT, '09', PRODUCT_QTY) AS D9,
+        DECODE(DT, '10', PRODUCT_QTY) AS D10,
+        DECODE(DT, '11', PRODUCT_QTY) AS D11,
+        DECODE(DT, '12', PRODUCT_QTY) AS D12,
+        DECODE(DT, '13', PRODUCT_QTY) AS D13,
+        DECODE(DT, '14', PRODUCT_QTY) AS D14,
+        DECODE(DT, '15', PRODUCT_QTY) AS D15,
+        DECODE(DT, '16', PRODUCT_QTY) AS D16,
+        DECODE(DT, '17', PRODUCT_QTY) AS D17,
+        DECODE(DT, '18', PRODUCT_QTY) AS D18,
+        DECODE(DT, '19', PRODUCT_QTY) AS D19,
+        DECODE(DT, '20', PRODUCT_QTY) AS D20,
+        DECODE(DT, '21', PRODUCT_QTY) AS D21,
+        DECODE(DT, '22', PRODUCT_QTY) AS D22,
+        DECODE(DT, '23', PRODUCT_QTY) AS D23,
+        DECODE(DT, '24', PRODUCT_QTY) AS D24,
+        DECODE(DT, '25', PRODUCT_QTY) AS D25,
+        DECODE(DT, '26', PRODUCT_QTY) AS D26,
+        DECODE(DT, '27', PRODUCT_QTY) AS D27,
+        DECODE(DT, '28', PRODUCT_QTY) AS D28,
+        DECODE(DT, '29', PRODUCT_QTY) AS D29,
+        DECODE(DT, '30', PRODUCT_QTY) AS D30,
+        DECODE(DT, '31', PRODUCT_QTY) AS D31
+    FROM (
+        SELECT 
+            A.COMP_CD,
+            B.COMP_NAME,
+            A.ITEM_CD,
+            C.ITEM_NAME,
+            TO_CHAR(A.PLAN_DT,'DD') AS DT,
+            A.PRODUCT_QTY
+        FROM
+            TB_PRODUCT_INFO A
+            JOIN TB_PARTNER_INFO B ON A.COMP_CD = B.COMP_CD
+            JOIN TB_ITEM_INFO C ON A.ITEM_CD = C.ITEM_CD
+        WHERE
+            TO_CHAR(A.PLAN_DT,'YYYY') = #{planYear}
+        AND
+	    	TO_CHAR(A.PLAN_DT,'MM') = #{planMonth}
+        <if test="compCd != null and compCd != ''">
+			AND A.COMP_CD = #{compCd}
+		</if>
+        ORDER BY A.COMP_CD, A.ITEM_CD, DT
+    )
+)
+</select>
+
+<select id = "selectMonthUseTOexcel" resultMap = "mthProMap">
+	SELECT A.ITEM_CD, C.ITEM_NAME, NVL(B.SITEM_CD,' ')SITEM_CD, NVL(D.ITEM_NAME,' ')SITEM_NAME, A.PRODUCT_QTY, NVL(B.INS_QTY,0)INS_QTY ,
+	(SELECT A.PRODUCT_QTY * INS_QTY FROM DUAL)AS TOTAL_QTY 
+	FROM (
+			SELECT 
+			 ITEM_CD, SUM(PRODUCT_QTY) PRODUCT_QTY
+			 FROM TB_PRODUCT_INFO
+			 WHERE 1=1
+			 AND TO_CHAR(PLAN_DT, 'YYYYMM') = #{planDt}
+			 <if test="compCd != null and compCd != ''">
+			AND COMP_CD = #{compCd}
+			</if>
+			GROUP BY ITEM_CD
+			) A, ( 
+			SELECT ITEM_CD, SITEM_CD, INS_QTY FROM TB_BOM_DTL 
+			 WHERE 1=1
+			   ) B, TB_ITEM_INFO C, TB_ITEM_INFO D
+			WHERE A.ITEM_CD = B.ITEM_CD(+)
+			  AND A.ITEM_CD = C.ITEM_CD
+			  AND B.SITEM_CD = D.ITEM_CD(+)
+			  ORDER BY A.ITEM_CD, B.SITEM_CD
+
+</select>
+
+</mapper>

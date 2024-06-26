@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qms.product.dao.ProductDao">
+<resultMap type="com.qms.product.vo.ProductVO" id="mthProMap">
+			<result property="compCd" column="COMP_CD" />
+			<result property="itemCd" column="ITEM_CD" />
+			<result property="itemName" column="ITEM_NAME" />
+			<result property="sitemCd" column="SITEM_CD" />
+			<result property="sitemName" column="SITEM_NAME" />
+			<result property="productQty" column="PRODUCT_QTY" />
+			<result property="insQty" column="INS_QTY" />
+			<result property="demandQty" column="DEMAND_QTY" />
+			<result property="planDt" column="PLAN_DT" />
+		</resultMap>
+		<resultMap type="com.qms.product.vo.proVO" id="ProMap">
+			<result property="itemCd" column="item_cd" />
+			<result property="itemName" column="item_name" />
+			<result property="compCd" column="comp_cd" />
+			<result property="compName" column="comp_name" />
+			<result property="planDt" column="plan_dt" />
+			<result property="productQty" column="product_qty" />
+			<result property="regDt" column="reg_dt" />
+			<result property="regUserId" column="reg_user_id" />
+			<result property="updDt" column="upd_dt" />
+			<result property="updUserId" column="upd_user_id" />
+			<result property="productYear" column="product_year" />
+			<result property="productMonth" column="product_month" />
+			<result property="boxType" column="box_type" />
+			<result property="boxQty" column="box_qty" />
+			<result property="weight" column="weight" />
+			<result property="planQty" column="plan_Qty" />
+			<result property="insQty" column="ins_qty" />
+			<result property="sitemCd" column="sitem_cd" />
+			<result property="sitemName" column="sitem_name" />
+			<result property="userId" column="user_id" />
+			<result property="userName" column="user_name" />
+		</resultMap>
+
+		
+		<select id = "selectProductInfo" resultMap = "ProMap">
+		SELECT
+            B.COMP_CD,
+            C.COMP_NAME,
+            D.ITEM_CD,
+            D.ITEM_NAME,
+            B.PRODUCT_QTY,
+            TO_CHAR(B.PLAN_DT, 'DD') AS PLAN_DT
+        FROM
+            TB_PARTNER_ITEM A
+            LEFT JOIN TB_PRODUCT_INFO B ON
+            A.ITEM_CD = B.ITEM_CD AND
+            A.COMP_CD = B.COMP_CD
+            LEFT JOIN TB_PARTNER_INFO C ON
+            A.COMP_CD = C.COMP_CD
+            LEFT JOIN TB_ITEM_INFO D ON
+            A.ITEM_CD = D.ITEM_CD
+        WHERE 
+            TO_CHAR(B.PLAN_DT, 'YY/MM') = #{planDt}
+            <if test="compCd != null and compCd != ''">
+			AND A.COMP_CD = #{compCd}
+			</if>
+		</select>
+	
+	<select id="selectPartnerInfo" resultMap="ProMap">
+		SELECT A.ITEM_CD, B.ITEM_NAME,C.COMP_NAME
+		FROM TB_PARTNER_ITEM A, TB_ITEM_INFO B ,TB_PARTNER_INFO C
+		WHERE A.ITEM_CD = B.ITEM_CD
+		AND A.COMP_CD = C.COMP_CD
+		<if test="compCd != null and compCd != ''">
+			AND A.COMP_CD = #{compCd}
+		</if>
+		ORDER BY A.ITEM_CD
+	</select>
+	<select id = "selectModalInfo" resultMap ="ProMap">
+	SELECT
+	    A.ITEM_CD,
+	    C.ITEM_NAME,
+	    (SELECT COM_NAME FROM TB_COM_CODE WHERE COM_GRP_CD = 'IT03' AND C.BOX_TYPE = COM_CD) AS BOX_TYPE,
+	    C.BOX_QTY,
+	    C.WEIGHT,
+	    B.PLAN_QTY,
+	    D.PRODUCT_QTY,
+		D.USER_ID
+	FROM
+	    TB_PARTNER_ITEM A
+	    LEFT JOIN (SELECT * FROM TB_PLAN_INFO WHERE PLAN_DT LIKE '%' || #{planDt} || '%') B
+	    ON A.COMP_CD = B.COMP_CD AND A.ITEM_CD = B.ITEM_CD
+	    LEFT JOIN TB_ITEM_INFO C ON A.ITEM_CD = C.ITEM_CD
+	    LEFT JOIN TB_PRODUCT_INFO D ON A.COMP_CD = D.COMP_CD AND C.ITEM_CD = D.ITEM_CD AND D.PLAN_DT = #{planDt}
+	WHERE
+	    A.COMP_CD = #{compCd}
+	</select>
+	
+	
+	<select id = "selectAllUser" resultMap = "ProMap">
+	SELECT USER_ID, USER_NAME
+    FROM TB_USER_INFO
+	</select>
+	<delete id ="deleteItem">
+	DELETE FROM TB_PRODUCT_INFO
+    WHERE COMP_CD = #{compCd}
+    AND PLAN_DT = #{planDt}
+	</delete>
+	<update  id="insertItem">
+    <foreach collection="itemlist" item="item" open="INSERT ALL" close="SELECT * FROM DUAL" separator=" ">
+	INTO TB_PRODUCT_INFO (
+		 COMP_CD,
+		 PLAN_DT,
+		 ITEM_CD,
+		 USER_ID,
+		 PRODUCT_QTY,
+		 REG_DT,
+		 REG_USER_ID
+	  )
+		VALUES (
+	 #{compCd},#{planDt}, #{item.itemCd}, #{item.userId}
+	 ,  #{item.productQty}, SYSDATE, #{regUserId}
+	 )
+    		</foreach>
+		</update>
+		
+		<select id = "selectUseBomInfo" resultMap = "ProMap">
+		SELECT A.ITEM_CD, C.ITEM_NAME, NVL(B.SITEM_CD,' ')SITEM_CD, NVL(D.ITEM_NAME,' ')SITEM_NAME, A.PRODUCT_QTY, NVL(B.INS_QTY,0)INS_QTY FROM (
+		SELECT 
+		 ITEM_CD, SUM(PRODUCT_QTY) PRODUCT_QTY
+		 FROM TB_PRODUCT_INFO
+		 WHERE 1=1
+		 AND TO_CHAR(PLAN_DT, 'YYYYMM') = #{planDt}
+		 <if test="compCd != null and compCd != ''">
+		AND COMP_CD = #{compCd}
+		</if>
+		GROUP BY ITEM_CD
+		) A, ( 
+		SELECT ITEM_CD, SITEM_CD, INS_QTY FROM TB_BOM_DTL 
+		 WHERE 1=1
+		   ) B, TB_ITEM_INFO C, TB_ITEM_INFO D
+		WHERE A.ITEM_CD = B.ITEM_CD(+)
+		  AND A.ITEM_CD = C.ITEM_CD
+		  AND B.SITEM_CD = D.ITEM_CD(+)
+		  ORDER BY A.ITEM_CD, B.SITEM_CD
+		
+		</select>
+	
+	<select id = "selectTotalMonthProCount" resultType ="integer">
+				SELECT
+				   	COUNT(*)
+				FROM
+				    (
+				    SELECT 
+				    	A.PLAN_DT,
+				        A.COMP_CD,
+				        A.ITEM_CD,
+				        B.ORDER_QTY,
+				        B.PLAN_QTY,
+				        A.PRODUCT_QTY
+				    FROM
+				        TB_PRODUCT_INFO A, TB_PLAN_INFO B
+				    WHERE
+				        A.COMP_CD = B.COMP_CD
+				    AND
+				        A.PLAN_DT = B. PLAN_DT
+				    AND
+				        A.ITEM_CD = B. ITEM_CD
+				    <if test="compCd != null and compCd != ''">
+		            AND 
+		            	A.COMP_CD LIKE '%' || #{compCd} || '%'
+		        	</if>    
+				        )C,
+				        TB_ITEM_INFO D,
+				        TB_PARTNER_INFO E
+				WHERE
+				    C.ITEM_CD = D.ITEM_CD
+				AND
+				    C.COMP_CD = E.COMP_CD
+	        	AND
+    				TO_CHAR(C.PLAN_DT,'YYYYMM') = #{productDt}    
+		</select>
+		
+		<select id = "selectMonthProList" resultMap ="ProMap">
+			 SELECT
+		        RN,
+		        C.PLAN_DT,
+		        C.COMP_CD,
+		        E.COMP_NAME,
+		        C.ITEM_CD,
+		        D.ITEM_NAME,
+		        C.ORDER_QTY,
+		        C.PLAN_QTY,
+		        C.PRODUCT_QTY
+		    FROM
+		        (
+		        SELECT 
+		            ROW_NUMBER() OVER (ORDER BY A.COMP_CD, A.ITEM_CD) AS RN,
+		            A.PLAN_DT,
+		            A.COMP_CD,
+		            A.ITEM_CD,
+		            B.ORDER_QTY,
+		            B.PLAN_QTY,
+		            A.PRODUCT_QTY
+		        FROM
+		            TB_PRODUCT_INFO A,
+		            TB_PLAN_INFO B
+		        WHERE
+		            A.COMP_CD = B.COMP_CD
+		        AND
+		            A.PLAN_DT = B.PLAN_DT
+		        AND
+		            A.ITEM_CD = B.ITEM_CD
+		        AND
+    				TO_CHAR(A.PLAN_DT,'YYYYMM') = #{productDt}    
+		        <if test="compCd != null and compCd != ''">
+		        AND 
+		        	A.COMP_CD LIKE '%' || #{compCd} || '%'
+		        </if>
+		        ) C,
+		        TB_ITEM_INFO D,
+		        TB_PARTNER_INFO E
+		    WHERE
+		        C.ITEM_CD = D.ITEM_CD
+		    AND
+		        C.COMP_CD = E.COMP_CD 
+		    AND RN <![CDATA[ > ]]> (#{currentPage} - 1) * #{countPerPage} 
+		    AND RN <![CDATA[ <= ]]> #{currentPage} * #{countPerPage}    
+		</select>
+		<!-- 복붙용 표시 끝 (시작부터 끝까지 복사해주세요)-->
+		
+	<select id="selectTotalMthProCount" resultType="integer">
+			SELECT COUNT(*)
+                
+        FROM
+            (SELECT
+                A.COMP_CD,
+                A.ITEM_CD,
+                B.SITEM_CD
+            FROM 
+                TB_PRODUCT_INFO A,
+                TB_BOM_DTL B
+            WHERE
+                A.ITEM_CD = B.ITEM_CD
+			 AND
+			    TO_CHAR(A.PLAN_DT,'YYYY') = #{mthProYear}
+			 AND
+			    TO_CHAR(A.PLAN_DT,'MM') = #{mthProMonth}
+			 <if test="compCd != '' and compCd != null">
+			    AND A.COMP_CD = #{compCd}
+			 </if>
+			)
+	</select>
+
+	<select id="selectMonthlyProductList" resultMap="mthProMap">
+				SELECT
+					COMP_CD,
+					ITEM_CD,
+					ITEM_NAME,
+					SITEM_CD,
+					SITEM_NAME,
+					PRODUCT_QTY,
+					INS_QTY,
+					DEMAND_QTY,
+					PLAN_DT
+				FROM					
+				 (SELECT
+				 	ROWNUM RN,
+			        A.COMP_CD,
+			        A.ITEM_CD,
+			        C.ITEM_NAME,
+			        B.SITEM_CD,
+			        D.ITEM_NAME AS SITEM_NAME,
+			        A.PRODUCT_QTY,
+			        B.INS_QTY,
+			        A.PRODUCT_QTY*B.INS_QTY AS DEMAND_QTY,
+			        A.PLAN_DT
+			    FROM 
+			        TB_PRODUCT_INFO A,
+			        TB_BOM_DTL B,
+			        TB_ITEM_INFO C,
+			        TB_ITEM_INFO D
+			    WHERE
+			        A.ITEM_CD = B.ITEM_CD
+			    AND
+			        A.ITEM_CD = C.ITEM_CD
+			    AND 
+			        B.SITEM_CD = D.ITEM_CD
+			    AND
+			    	TO_CHAR(A.PLAN_DT,'YYYY') = #{mthProYear}
+			    AND
+			    	TO_CHAR(A.PLAN_DT,'MM') = #{mthProMonth}
+			    <if test="compCd != '' and compCd != null">
+			    	AND A.COMP_CD = #{compCd}
+				</if>
+				)
+				WHERE RN <![CDATA[ > ]]> (#{currentPage} - 1) * #{countPerPage} 
+		    	AND RN <![CDATA[ <= ]]> #{currentPage} * #{countPerPage}
+		    	
+	</select>
+		
+	
+
+
+</mapper>

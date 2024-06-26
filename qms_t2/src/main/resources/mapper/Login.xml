@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- QMS LOGIN -->
+<mapper namespace="com.qms.login.dao.LoginDao">
+	
+	<resultMap type="com.qms.user.vo.UserVO" id="userMap">
+		<result property="userId" 				column="USER_ID"/>
+		<result property="userPwd" 				column="USER_PWD"/>
+		<result property="userName"				column="USER_NAME"/>
+		<result property="phone" 				column="PHONE"/>
+		<result property="email" 				column="EMAIL"/>
+		<result property="deptCd" 				column="DEPT_CD" />
+		<result property="positionCd" 			column="POSITION_CD" />
+		<result property="leaveYn" 				column="LEAVE_YN" />
+		<result property="leaveDt" 				column="LEAVE_DT" />		
+		<result property="deptName" 			column="DEPT_NAME" />	
+		<result property="comName" 				column="COM_NAME" />	
+		<result property="comGrpCd" 			column="COM_GRP_CD" />	
+		
+	</resultMap>
+
+	
+	<select id="selectUserInfo" resultMap="userMap">
+	
+			SELECT 	
+				A.USER_ID,
+			    A.USER_NAME,
+			    A.USER_PWD,
+			    B.DEPT_NAME,
+			    C.COM_NAME, 
+			    A.LEAVE_YN
+			FROM 
+			    TB_USER_INFO A
+			INNER JOIN 
+			    TB_DEPT_INFO B ON A.DEPT_CD = B.DEPT_CD
+			INNER JOIN 
+			    TB_COM_CODE C ON A.POSITION_CD = C.COM_CD
+			 WHERE 
+			 	A.USER_ID = #{userId} 
+                AND C.COM_GRP_CD = #{comGrpCd}
+			
+	</select>
+	
+	<update id="updateUserPwd">
+	
+	UPDATE TB_USER_INFO
+	SET 
+	USER_PWD = #{userPwd}
+    WHERE USER_ID = #{userId}
+    
+	</update>
+	
+	
+</mapper>
