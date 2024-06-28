@@ -1,5 +1,19 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="com.qms.user.vo.UserVO"%>
+<%@ page import="java.util.Locale"%>
+<%@ page import="org.springframework.web.servlet.support.RequestContextUtils"%>
+
+<%
+Locale currentLocale = RequestContextUtils.getLocale(request);
+String currentLanguage = currentLocale.getLanguage();
+String languageText = "Language";
+if ("ko".equals(currentLanguage)) {
+    languageText = "한국어";
+} else if ("en".equals(currentLanguage)) {
+    languageText = "English";
+}
+%>
 <%
 UserVO user =(UserVO)session.getAttribute("QMSUser");
 String userName = "";
@@ -22,16 +36,27 @@ if (user != null) {
 
 
 	<nav class="header-nav ms-auto">
-		<ul class="d-flex align-items-center">
+        <ul class="d-flex align-items-center">
 
-			<li class="nav-item d-block d-lg-none"><a class="nav-link nav-icon search-bar-toggle " href="#"> <i class="bi bi-search"></i>
-			</a></li>
-			<!-- End Search Icon-->
+            <li class="nav-item d-block d-lg-none"><a class="nav-link nav-icon search-bar-toggle " href="#"> <i class="bi bi-search"></i>
+            </a></li>
+            <!-- End Search Icon-->
+            <li class="nav-item">
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <%=languageText%>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/changeLanguage?lang=ko"> <i class="fas fa-flag"></i> 한국어
+                        </a></li>
+                        <li><a class="dropdown-item" href="${pageContext.request.contextPath}/changeLanguage?lang=en"> <i class="fas fa-flag"></i> English
+                        </a></li>
+                    </ul>
+                </div>
+            </li>
 
-			<li class="nav-item dropdown pe-3"><a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown"> 
-			<span class="d-none d-md-block dropdown-toggle ps-2"><%= userName %>(<%= userPosition %>)</span>
-			</a>
-			<!-- End Profile Iamge Icon -->
+            <li class="nav-item dropdown pe-3"><a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown"> <span class="d-none d-md-block dropdown-toggle ps-2"><%=userName%>(<%=userPosition%>)</span>
+            </a> <!-- End Profile Iamge Icon -->
 
 				<ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
 					<li class="dropdown-header">
